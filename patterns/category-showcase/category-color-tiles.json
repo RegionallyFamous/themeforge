@@ -1,0 +1,151 @@
+{
+  "id": "category-color-tiles",
+  "name": "Category Showcase — Color Tiles",
+  "category": "category-showcase",
+  "description": "Three flat brand-color tiles with category labels and CTAs. No imagery — color alone differentiates each tile (placeholders rotate through palette). Bold, immediate, perfect for stores where the categories don't have great photography yet.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["playful", "sport", "y2k", "brutalist", "coastal", "editorial"],
+
+  "slots": {
+    "section_eyebrow": { "type": "text", "max_chars": 30, "tone": "microcopy" },
+    "section_heading": { "type": "text", "max_chars": 60, "tone": "hero" },
+
+    "tile_1_label": { "type": "text", "max_chars": 40, "tone": "hero" },
+    "tile_1_blurb": { "type": "text", "max_chars": 100, "tone": "supporting" },
+    "tile_1_cta":   { "type": "text", "max_chars": 20, "tone": "cta" },
+    "tile_1_url":   { "type": "url" },
+
+    "tile_2_label": { "type": "text", "max_chars": 40, "tone": "hero" },
+    "tile_2_blurb": { "type": "text", "max_chars": 100, "tone": "supporting" },
+    "tile_2_cta":   { "type": "text", "max_chars": 20, "tone": "cta" },
+    "tile_2_url":   { "type": "url" },
+
+    "tile_3_label": { "type": "text", "max_chars": 40, "tone": "hero" },
+    "tile_3_blurb": { "type": "text", "max_chars": 100, "tone": "supporting" },
+    "tile_3_cta":   { "type": "text", "max_chars": 20, "tone": "cta" },
+    "tile_3_url":   { "type": "url" }
+  },
+
+  "theme_tokens": [
+    "color.primary",
+    "color.foreground",
+    "color.background",
+    "color.background-alt",
+    "typography.heading",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/group",
+          "attrs": { "layout": { "type": "constrained", "contentSize": "640px" } },
+          "innerBlocks": [
+            { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" }, "slot": "section_eyebrow" },
+            { "name": "core/heading",   "attrs": { "level": 2, "fontSize": "x-large" },         "slot": "section_heading" }
+          ]
+        },
+        {
+          "name": "core/columns",
+          "gap": "blank",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                {
+                  "name": "core/group",
+                  "attrs": {
+                    "backgroundColor": "primary",
+                    "textColor": "background",
+                    "style": { "spacing": { "padding": { "top": "var:preset|spacing|50", "bottom": "var:preset|spacing|50", "left": "var:preset|spacing|40", "right": "var:preset|spacing|40" }, "dimensions": { "minHeight": "320px" } } },
+                    "layout": { "type": "constrained", "justifyContent": "center" }
+                  },
+                  "innerBlocks": [
+                    { "name": "core/heading",   "attrs": { "level": 3, "fontSize": "large", "textColor": "background" }, "slot": "tile_1_label" },
+                    { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "background" },             "slot": "tile_1_blurb" },
+                    {
+                      "name": "core/buttons",
+                      "innerBlocks": [
+                        {
+                          "name": "core/button",
+                          "attrs": { "backgroundColor": "background", "textColor": "primary" },
+                          "slot": { "text": "tile_1_cta", "url": "tile_1_url" }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                {
+                  "name": "core/group",
+                  "attrs": {
+                    "backgroundColor": "foreground",
+                    "textColor": "background",
+                    "style": { "spacing": { "padding": { "top": "var:preset|spacing|50", "bottom": "var:preset|spacing|50", "left": "var:preset|spacing|40", "right": "var:preset|spacing|40" }, "dimensions": { "minHeight": "320px" } } },
+                    "layout": { "type": "constrained", "justifyContent": "center" }
+                  },
+                  "innerBlocks": [
+                    { "name": "core/heading",   "attrs": { "level": 3, "fontSize": "large", "textColor": "background" }, "slot": "tile_2_label" },
+                    { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "background" },             "slot": "tile_2_blurb" },
+                    {
+                      "name": "core/buttons",
+                      "innerBlocks": [
+                        {
+                          "name": "core/button",
+                          "attrs": { "backgroundColor": "background", "textColor": "foreground" },
+                          "slot": { "text": "tile_2_cta", "url": "tile_2_url" }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                {
+                  "name": "core/group",
+                  "attrs": {
+                    "backgroundColor": "background-alt",
+                    "textColor": "foreground",
+                    "style": { "spacing": { "padding": { "top": "var:preset|spacing|50", "bottom": "var:preset|spacing|50", "left": "var:preset|spacing|40", "right": "var:preset|spacing|40" }, "dimensions": { "minHeight": "320px" } } },
+                    "layout": { "type": "constrained", "justifyContent": "center" }
+                  },
+                  "innerBlocks": [
+                    { "name": "core/heading",   "attrs": { "level": 3, "fontSize": "large", "textColor": "foreground" }, "slot": "tile_3_label" },
+                    { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "foreground" },             "slot": "tile_3_blurb" },
+                    {
+                      "name": "core/buttons",
+                      "innerBlocks": [
+                        {
+                          "name": "core/button",
+                          "attrs": { "backgroundColor": "primary", "textColor": "background" },
+                          "slot": { "text": "tile_3_cta", "url": "tile_3_url" }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

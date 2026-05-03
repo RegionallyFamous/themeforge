@@ -109,11 +109,16 @@ export function createLLM(config: LLMConfig = {}): LLM {
       const messages: MessageParam[] = [{ role: "user", content: opts.userPrompt }];
       let lastIssues: z.ZodIssue[] = [];
 
+      // Opus 4.7+ deprecated the `temperature` parameter (the model
+      // handles sampling internally). Older models (Sonnet 4.6, Haiku
+      // 4.5) still accept it. Detect by id prefix and omit when needed.
+      const supportsTemperature = !/^claude-opus-4-(7|[8-9]|\d{2,})/.test(model);
+
       for (let attempt = 0; attempt <= maxRetries; attempt++) {
         const requestBody = {
           model,
           max_tokens: maxTokens,
-          temperature,
+          ...(supportsTemperature ? { temperature } : {}),
           system: opts.systemPrompt,
           tools: [tool],
           tool_choice: { type: "tool" as const, name: toolName },

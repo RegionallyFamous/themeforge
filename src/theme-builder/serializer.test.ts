@@ -109,8 +109,10 @@ describe("serializer: grid-3up", () => {
   const pattern = loadPattern("patterns/product-grid/grid-3up.json");
   const indexHtml = loadFixture("samples/coffee-roaster/output/templates/index.html");
   // The grid-3up section is the second top-level pattern in the hand-built
-  // index.html: lines 36–62 inclusive (one outer wp:group plus its body).
-  const expected = extractLines(indexHtml, 36, 62);
+  // index.html: lines 36–64 inclusive (longer now that the pattern uses
+  // the modern WC product-collection block with woocommerce/product-template
+  // and the WC sale badge).
+  const expected = extractLines(indexHtml, 36, 64);
 
   const resolutions: Record<string, SlotResolution> = {
     section_eyebrow: { type: "text", value: "This week's roast" },

@@ -152,6 +152,12 @@ Picking guidelines:
 - archive-product: a product grid is mandatory. A newsletter or testimonial below works for many niches. 1–3 patterns.
 - page: pick a calmer set — hero, body section, FAQ, newsletter. 2–4 patterns.
 
+**Visual energy by mood — match the loudness of the patterns to the brand's loudness, or the result feels generic:**
+
+- coastal / playful / sport / y2k / brutalist: lean *bold*. Prefer patterns whose names suggest visual swing — \`hero-image-fullbleed\`, \`hero-color-block\`, \`category-color-tiles\`, \`hero-marquee\`, \`grid-feature\`. These brands need a hero that announces itself; \`hero-text-only\` and \`hero-split\` are too quiet on their own. Open with one of the bold patterns and let the rest of the page calm down around it.
+- editorial / heritage / lux-mono / apothecary / nordic / botanical: lean *restrained*. Prefer \`hero-split\`, \`hero-cover\`, \`hero-text-only\`, \`category-trio\`, \`testimonial-single\`. Avoid full-bleed-image and color-block heroes — they'd clash with the magazine rhythm.
+- sci: structural / grid-driven. \`hero-text-only\`, \`grid-4up\`, \`usp-row-five\`, \`faq-flat\`.
+
 Hard constraints (the tool will reject violations):
 
 - Only use pattern IDs from the catalog.

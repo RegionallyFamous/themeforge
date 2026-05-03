@@ -8,13 +8,22 @@
  */
 
 import type { ThemeTokens } from "../pipeline/types.js";
+import { fontFaceForFamily } from "./bunny-fonts.js";
 
 const SCHEMA_URL = "https://schemas.wp.org/trunk/theme.json";
+
+export interface FontFaceEntry {
+  fontFamily: string;
+  fontWeight: string;
+  fontStyle: "normal" | "italic";
+  src: string[];
+}
 
 export interface FontFamilyEntry {
   name: string;
   slug: string;
   fontFamily: string;
+  fontFace?: FontFaceEntry[];
 }
 
 export interface FontSizeEntry {
@@ -141,7 +150,18 @@ export function buildThemeJson(tokens: ThemeTokens): ThemeJson {
 }
 
 function buildFontFamily(stack: string, slug: "heading" | "body"): FontFamilyEntry {
-  return { name: firstFamilyName(stack), slug, fontFamily: stack };
+  const entry: FontFamilyEntry = {
+    name: firstFamilyName(stack),
+    slug,
+    fontFamily: stack,
+  };
+  // Auto-attach @font-face declarations sourced from Bunny Fonts so the
+  // brand's chosen typography actually loads (rather than falling back
+  // to the system stack). Returns undefined for commercial / unknown
+  // families — the operator can drop licensed files in later.
+  const faces = fontFaceForFamily(entry);
+  if (faces && faces.length > 0) entry.fontFace = faces;
+  return entry;
 }
 
 function firstFamilyName(stack: string): string {

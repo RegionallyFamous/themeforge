@@ -1,0 +1,66 @@
+<!-- wp:template-part {"slug":"header","tagName":"header"} /-->
+
+<!-- wp:group {"align":"full","tagName":"section","style":{"spacing":{"padding":{"top":"var:preset|spacing|section","bottom":"var:preset|spacing|section"}}},"layout":{"type":"constrained"}} -->
+<section class="wp-block-group alignfull" style="padding-top:var(--wp--preset--spacing--section);padding-bottom:var(--wp--preset--spacing--section)">
+ <!-- wp:columns {"verticalAlignment":"center","align":"wide"} -->
+ <div class="wp-block-columns alignwide are-vertically-aligned-center">
+  <!-- wp:column {"width":"55%","verticalAlignment":"center"} -->
+  <div class="wp-block-column is-vertically-aligned-center" style="flex-basis:55%">
+   <!-- wp:heading {"level":1,"fontSize":"huge"} -->
+   <h1 class="wp-block-heading has-huge-font-size">Single-origin coffee, slow-roasted in small batches.</h1>
+   <!-- /wp:heading -->
+   <!-- wp:paragraph {"fontSize":"medium"} -->
+   <p class="has-medium-font-size">Beans sourced from named farms across Ethiopia, Colombia, and Guatemala. Roasted Tuesday through Thursday on a 5kg drum. Shipped within 48 hours.</p>
+   <!-- /wp:paragraph -->
+   <!-- wp:buttons -->
+   <div class="wp-block-buttons">
+    <!-- wp:button {"backgroundColor":"primary","textColor":"background"} -->
+    <div class="wp-block-button"><a class="wp-block-button__link has-background-color has-primary-background-color has-text-color has-background wp-element-button" href="/shop">Shop the roast</a></div>
+    <!-- /wp:button -->
+   </div>
+   <!-- /wp:buttons -->
+  </div>
+  <!-- /wp:column -->
+  <!-- wp:column {"width":"45%"} -->
+  <div class="wp-block-column" style="flex-basis:45%">
+   <!-- wp:image {"sizeSlug":"large","aspectRatio":"4/5"} -->
+   <figure class="wp-block-image size-large" style="aspect-ratio:4/5"><img src="https://placeholder.local/hero_lifestyle/4x5" alt="Hero lifestyle photograph"/></figure>
+   <!-- /wp:image -->
+  </div>
+  <!-- /wp:column -->
+ </div>
+ <!-- /wp:columns -->
+</section>
+<!-- /wp:group -->
+
+<!-- wp:group {"align":"full","tagName":"section","style":{"spacing":{"padding":{"top":"var:preset|spacing|section","bottom":"var:preset|spacing|section"}}},"layout":{"type":"constrained"}} -->
+<section class="wp-block-group alignfull" style="padding-top:var(--wp--preset--spacing--section);padding-bottom:var(--wp--preset--spacing--section)">
+ <!-- wp:group {"layout":{"type":"constrained","contentSize":"640px"}} -->
+ <div class="wp-block-group">
+  <!-- wp:paragraph {"fontSize":"small","textColor":"muted"} -->
+  <p class="has-muted-color has-text-color has-small-font-size">This week's roast</p>
+  <!-- /wp:paragraph -->
+  <!-- wp:heading {"level":2,"fontSize":"x-large"} -->
+  <h2 class="wp-block-heading has-x-large-font-size">Three coffees on the bench</h2>
+  <!-- /wp:heading -->
+  <!-- wp:paragraph -->
+  <p>Rotating selection from this week's roast. Drink them within four weeks of the roast date for best results.</p>
+  <!-- /wp:paragraph -->
+ </div>
+ <!-- /wp:group -->
+
+ <!-- wp:woocommerce/product-collection {"queryId":0,"query":{"perPage":3,"pages":0,"offset":0,"postType":"product","order":"desc","orderBy":"date","search":"","exclude":[],"inherit":false,"taxQuery":{},"isProductCollectionBlock":true,"woocommerceOnSale":false,"woocommerceStockStatus":["instock","outofstock","onbackorder"],"woocommerceAttributes":[],"woocommerceHandPickedProducts":[]},"tagName":"div","dimensions":{"widthType":"fill","fixedWidth":""},"displayLayout":{"type":"flex","columns":3},"align":"wide"} -->
+ <div class="wp-block-woocommerce-product-collection">
+  <!-- wp:woocommerce/product-template -->
+   <!-- wp:woocommerce/product-image {"showSaleBadge":true,"aspectRatio":"1","imageSizing":"thumbnail","isDescendentOfQueryLoop":true} -->
+    <!-- wp:woocommerce/product-sale-badge {"isDescendentOfQueryLoop":true,"align":"right"} /-->
+   <!-- /wp:woocommerce/product-image -->
+   <!-- wp:post-title {"level":3,"isLink":true,"fontSize":"medium","__woocommerceNamespace":"woocommerce/product-collection/product-title"} /-->
+   <!-- wp:woocommerce/product-price {"isDescendentOfQueryLoop":true,"fontSize":"small"} /-->
+  <!-- /wp:woocommerce/product-template -->
+ </div>
+ <!-- /wp:woocommerce/product-collection -->
+</section>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->

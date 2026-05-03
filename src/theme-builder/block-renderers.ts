@@ -100,7 +100,17 @@ renderers["core/group"] = (block, ctx) => {
   if (a.backgroundColor) {
     classes.push(`has-${a.backgroundColor}-background-color`, "has-background");
   }
-  const decls = paddingDecls(a);
+  if (a.textColor) {
+    classes.push(`has-${a.textColor}-color`, "has-text-color");
+  }
+  const decls = [
+    ...paddingDecls(a),
+    ...minHeightDecl(a),
+    ...backgroundImageDecls(a),
+  ];
+  if (typeof (a.style as { color?: { background?: string } } | undefined)?.color?.background === "string") {
+    decls.push(`background-color:${(a.style as { color: { background: string } }).color.background}`);
+  }
   return renderContainer(
     block,
     ctx,
@@ -108,6 +118,26 @@ renderers["core/group"] = (block, ctx) => {
     `</${tag}>`,
   );
 };
+
+/**
+ * Pull `style.background.backgroundImage` (and matching size/position)
+ * out of group attrs into inline style declarations. Used to support
+ * full-bleed-image hero patterns without dragging in `core/cover`.
+ */
+function backgroundImageDecls(attrs: Record<string, unknown> | undefined): string[] {
+  const bg = (attrs?.style as { background?: { backgroundImage?: { url?: string }; backgroundSize?: string; backgroundPosition?: string } } | undefined)?.background;
+  if (!bg) return [];
+  const out: string[] = [];
+  if (bg.backgroundImage?.url) out.push(`background-image:url('${bg.backgroundImage.url}')`);
+  if (bg.backgroundSize) out.push(`background-size:${bg.backgroundSize}`);
+  if (bg.backgroundPosition) out.push(`background-position:${bg.backgroundPosition}`);
+  return out;
+}
+
+function minHeightDecl(attrs: Record<string, unknown> | undefined): string[] {
+  const dim = (attrs?.style as { dimensions?: { minHeight?: string } } | undefined)?.dimensions;
+  return dim?.minHeight ? [`min-height:${dim.minHeight}`] : [];
+}
 
 // ── core/columns ────────────────────────────────────────────────────────
 
@@ -228,6 +258,76 @@ renderers["core/image"] = (block, ctx) => {
   return renderLeaf(block, ctx, html);
 };
 
+// ── core/cover ──────────────────────────────────────────────────────────
+//
+// Full-bleed hero block. Renders an image background (when an `image`
+// slot is provided), a dim/overlay span, and an inner-container that
+// wraps the inner blocks. Mirrors WP's save-time markup so the WP
+// editor recognizes it for further customization.
+
+renderers["core/cover"] = (block, ctx) => {
+  const a = block.attrs ?? {};
+  const dimRatio = typeof a.dimRatio === "number" ? a.dimRatio : 50;
+  const minHeight =
+    typeof a.minHeight === "number"
+      ? `${a.minHeight}${(a.minHeightUnit as string | undefined) ?? "px"}`
+      : undefined;
+
+  const classes = ["wp-block-cover"];
+  classes.push(alignClass(a.align) ?? "");
+  if (a.contentPosition && typeof a.contentPosition === "string") {
+    classes.push("has-custom-content-position");
+    classes.push(`is-position-${a.contentPosition.replace(/\s+/g, "-")}`);
+  }
+  const styleDecls: string[] = [];
+  if (minHeight) styleDecls.push(`min-height:${minHeight}`);
+  if (typeof a.customOverlayColor === "string") {
+    styleDecls.push(`background-color:${a.customOverlayColor}`);
+  }
+
+  const dimClass = dimRatio === 0 ? "" : ` has-background-dim-${dimRatio} has-background-dim`;
+  const dimSpan = `<span aria-hidden="true" class="wp-block-cover__background${dimClass}"></span>`;
+
+  let imgTag = "";
+  // Pull the image from a slot if the pattern declared one. Lets the
+  // bundler rewrite the URL to a local placeholder.
+  if (typeof block.slot === "string") {
+    const img = getImageSlot(block, ctx);
+    const aspectSlug = img.aspect.replace(/:/g, "x");
+    const src = `https://placeholder.local/${img.role}/${aspectSlug}`;
+    const focal =
+      a.focalPoint && typeof a.focalPoint === "object"
+        ? formatFocalPoint(a.focalPoint as { x?: number; y?: number })
+        : null;
+    const objectPosStyle = focal ? ` style="object-position:${focal}"` : "";
+    const dataPos = focal ? ` data-object-position="${focal}"` : "";
+    imgTag = `<img class="wp-block-cover__image-background" alt="${img.alt}" src="${src}"${objectPosStyle} data-object-fit="cover"${dataPos}/>`;
+  }
+
+  const innerHtml = renderChildren(block.innerBlocks, { ...ctx, indent: ctx.indent + 1 });
+  const padOuter = pad(ctx);
+  const padInner = " ".repeat(ctx.indent + 1);
+
+  const lines = [
+    `${padOuter}${commentOpen(block.name, block.attrs)}`,
+    `${padOuter}<div${classAttr(classes)}${styleAttr(styleDecls)}>`,
+    `${padInner}${dimSpan}`,
+  ];
+  if (imgTag) lines.push(`${padInner}${imgTag}`);
+  lines.push(`${padInner}<div class="wp-block-cover__inner-container">`);
+  if (innerHtml.length > 0) lines.push(innerHtml);
+  lines.push(`${padInner}</div>`);
+  lines.push(`${padOuter}</div>`);
+  lines.push(`${padOuter}${commentClose(block.name)}`);
+  return lines.join("\n");
+};
+
+function formatFocalPoint(fp: { x?: number; y?: number }): string {
+  const x = typeof fp.x === "number" ? `${Math.round(fp.x * 100)}%` : "50%";
+  const y = typeof fp.y === "number" ? `${Math.round(fp.y * 100)}%` : "50%";
+  return `${x} ${y}`;
+}
+
 // ── core/spacer ─────────────────────────────────────────────────────────
 
 renderers["core/spacer"] = (block, ctx) => {
@@ -333,9 +433,47 @@ renderers["core/query-pagination-numbers"]  = (block, ctx) => renderVoid(block, 
 
 renderers["woocommerce/product-image-gallery"] = (block, ctx) => renderVoid(block, ctx);
 
-// ── woocommerce/product-image (void, dynamic) ───────────────────────────
+// ── woocommerce/product-image (dynamic — void OR container) ─────────────
+//
+// Modern WC accepts the block as either void (no inner blocks — image
+// only) or as a container holding extras like `woocommerce/product-sale-badge`.
+// We dispatch on whether the pattern provided innerBlocks.
 
-renderers["woocommerce/product-image"] = (block, ctx) => renderVoid(block, ctx);
+renderers["woocommerce/product-image"] = (block, ctx) => {
+  if ((block.innerBlocks?.length ?? 0) === 0) return renderVoid(block, ctx);
+  // No HTML wrapper — the inner blocks render directly between the
+  // block comments (mirroring what WC patterns ship). Pattern matches
+  // `core/post-template` style.
+  const inner = renderChildren(block.innerBlocks, ctx);
+  const lines = [`${pad(ctx)}${commentOpen(block.name, block.attrs)}`];
+  if (inner.length > 0) lines.push(inner);
+  lines.push(`${pad(ctx)}${commentClose(block.name)}`);
+  return lines.join("\n");
+};
+
+// ── woocommerce/product-template (container, no HTML wrapper) ───────────
+//
+// The modern WC equivalent of `core/post-template` for product
+// collections. Children render between the block comments at +1 indent
+// and WC's runtime stamps each one out per product in the loop.
+
+renderers["woocommerce/product-template"] = (block, ctx) => {
+  const inner = renderChildren(block.innerBlocks, ctx);
+  const lines = [`${pad(ctx)}${commentOpen(block.name, block.attrs)}`];
+  if (inner.length > 0) lines.push(inner);
+  lines.push(`${pad(ctx)}${commentClose(block.name)}`);
+  return lines.join("\n");
+};
+
+// ── More dynamic WC blocks (void) ───────────────────────────────────────
+
+renderers["woocommerce/product-sale-badge"]  = (block, ctx) => renderVoid(block, ctx);
+renderers["woocommerce/featured-product"]    = (block, ctx) => renderVoid(block, ctx);
+renderers["woocommerce/featured-category"]   = (block, ctx) => renderVoid(block, ctx);
+renderers["woocommerce/product-categories"]  = (block, ctx) => renderVoid(block, ctx);
+renderers["woocommerce/mini-cart"]           = (block, ctx) => renderVoid(block, ctx);
+renderers["woocommerce/customer-account"]    = (block, ctx) => renderVoid(block, ctx);
+renderers["woocommerce/product-search"]      = (block, ctx) => renderVoid(block, ctx);
 
 // ── woocommerce/product-price (void, dynamic) ───────────────────────────
 

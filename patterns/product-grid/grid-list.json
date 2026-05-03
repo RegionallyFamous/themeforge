@@ -57,17 +57,31 @@
           "gap": "blank",
           "attrs": {
             "queryId": 0,
+            "query": {
+              "perPage": 6, "pages": 0, "offset": 0, "postType": "product", "order": "desc", "orderBy": "date",
+              "search": "", "exclude": [], "inherit": false, "taxQuery": {},
+              "isProductCollectionBlock": true, "woocommerceOnSale": false,
+              "woocommerceStockStatus": ["instock", "outofstock", "onbackorder"],
+              "woocommerceAttributes": [], "woocommerceHandPickedProducts": []
+            },
+            "tagName": "div",
+            "dimensions": { "widthType": "fill", "fixedWidth": "" },
             "displayLayout": { "type": "list", "columns": 1 },
-            "query": { "perPage": 6, "pages": 0, "offset": 0, "postType": "product", "order": "desc", "orderBy": "date" }
+            "align": "wide"
           },
           "innerBlocks": [
             {
-              "name": "core/post-template",
+              "name": "woocommerce/product-template",
               "innerBlocks": [
-                { "name": "woocommerce/product-image", "attrs": { "imageSizing": "cropped", "aspectRatio": "1" } },
-                { "name": "core/post-title", "attrs": { "level": 3, "fontSize": "medium", "isLink": true } },
-                { "name": "woocommerce/product-price" },
-                { "name": "core/post-excerpt", "attrs": { "moreText": "Read more" } }
+                {
+                  "name": "woocommerce/product-image",
+                  "attrs": { "showSaleBadge": true, "aspectRatio": "1", "imageSizing": "thumbnail", "isDescendentOfQueryLoop": true },
+                  "innerBlocks": [
+                    { "name": "woocommerce/product-sale-badge", "attrs": { "isDescendentOfQueryLoop": true, "align": "right" } }
+                  ]
+                },
+                { "name": "core/post-title", "attrs": { "level": 3, "isLink": true, "fontSize": "medium", "__woocommerceNamespace": "woocommerce/product-collection/product-title" } },
+                { "name": "woocommerce/product-price", "attrs": { "isDescendentOfQueryLoop": true, "fontSize": "small" } }
               ]
             }
           ]

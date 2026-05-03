@@ -82,29 +82,46 @@ describe("buildPlaceholderSvg", () => {
     expect(svg.trimEnd()).toMatch(/<\/svg>$/);
   });
 
-  it("includes the role and aspect as labels", () => {
+  it("category roles render as a flat brand color block (block style)", () => {
     const svg = buildPlaceholderSvg("category_tile", "1:1", palette);
-    expect(svg).toContain(">category_tile<");
-    expect(svg).toContain(">1:1 · placeholder<");
+    // Block style: a single full-bleed rect filled with a chromatic
+    // palette color, no gradient.
+    expect(svg).toMatch(/<rect width="1600" height="1600" fill="#[0-9a-fA-F]{6}"\/>/);
+    expect(svg).not.toContain("<linearGradient");
+    // Picks from the chromatic palette (primary/foreground/etc.)
+    const usesChromatic = [palette.primary, palette.foreground, palette.backgroundAlt, palette.muted]
+      .some((c) => svg.includes(c));
+    expect(usesChromatic).toBe(true);
   });
 
-  it("uses the brand's palette colors", () => {
-    const svg = buildPlaceholderSvg("hero", "16:9", palette);
+  it("hero/lifestyle roles render with a gradient (gradient style)", () => {
+    const svg = buildPlaceholderSvg("hero_centerpiece", "16:9", palette);
+    expect(svg).toContain("<linearGradient");
+    expect(svg).toContain("<stop offset=\"0\"");
+    expect(svg).toContain("<stop offset=\"1\"");
+    // Wave layer for visual interest
+    expect(svg).toContain("<path d=");
+  });
+
+  it("logo / press / payment roles render the logo style (muted bar)", () => {
+    const svg = buildPlaceholderSvg("press_logo", "3:1", palette);
     expect(svg).toContain(palette.backgroundAlt);
-    expect(svg).toContain(palette.foreground);
-    expect(svg).toContain(palette.muted);
+    // Two rects: the backdrop and the bar mark — no gradient.
+    expect(svg).not.toContain("<linearGradient");
+    expect((svg.match(/<rect/g) ?? []).length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("uses the brand's palette colors throughout", () => {
+    const svg = buildPlaceholderSvg("hero", "16:9", palette);
+    // Gradient style — pulls at least one chromatic + one neutral
+    const hasChromatic = [palette.primary, palette.foreground].some((c) => svg.includes(c));
+    expect(hasChromatic).toBe(true);
   });
 
   it("is deterministic for the same inputs", () => {
-    const a = buildPlaceholderSvg("x", "16:9", palette);
-    const b = buildPlaceholderSvg("x", "16:9", palette);
+    const a = buildPlaceholderSvg("category_tile", "1:1", palette);
+    const b = buildPlaceholderSvg("category_tile", "1:1", palette);
     expect(a).toBe(b);
-  });
-
-  it("escapes quotes / angle brackets in role names", () => {
-    const svg = buildPlaceholderSvg('he"ro<role>', "1:1", palette);
-    expect(svg).toContain('he&quot;ro&lt;role&gt;');
-    expect(svg).not.toContain('he"ro<role>');
   });
 
   it("rejects malformed aspect ratios", () => {

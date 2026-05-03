@@ -6,7 +6,11 @@
  * of the LLM call discipline (see `docs/architecture.md`).
  */
 
-export const DEFAULT_MODEL = "claude-sonnet-4-6";
+// Opus 4.7 across every stage. The pipeline produces a single
+// sellable artifact per run — the upgrade in design judgment over
+// Sonnet is worth the per-stage cost. Override via `LLMConfig.model`
+// when iterating patterns or running cost-sensitive batches.
+export const DEFAULT_MODEL = "claude-opus-4-7";
 
 export type StageId =
   | "brand-interpreter"

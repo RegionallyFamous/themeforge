@@ -50,11 +50,20 @@ export function placeholderFilename(role: string, aspect: string): string {
 }
 
 /**
- * Build a single placeholder SVG for one role + aspect. Centered label,
- * soft branded backdrop, faint inset frame so the image area reads as a
- * placeholder rather than an empty rectangle. Output is normalized — no
- * trailing whitespace — so two builds with the same inputs produce
- * byte-identical files.
+ * Build a single placeholder SVG for one role + aspect.
+ *
+ * Picks a visual style based on the role name so the resulting set of
+ * placeholders feels like deliberate design choices, not wireframes:
+ *
+ *   - hero/lifestyle/centerpiece roles → a soft palette gradient with
+ *     a subtle abstract shape (wave / circle / diagonal). Reads as art.
+ *   - category/feature/tile roles → a flat brand color with a small
+ *     centered glyph. Reads as a category card.
+ *   - logo/headshot roles → muted backdrop + simple geometric mark.
+ *   - everything else → the gradient style.
+ *
+ * Output is normalized (no trailing whitespace, no random IDs) so two
+ * builds with the same inputs produce byte-identical files.
  */
 export function buildPlaceholderSvg(
   role: string,
@@ -65,25 +74,150 @@ export function buildPlaceholderSvg(
   const baseW = 1600;
   const baseH = Math.round((ah / aw) * baseW);
 
-  // Frame inset 6% of the shorter dimension.
-  const inset = Math.round(Math.min(baseW, baseH) * 0.06);
-  const frameStrokeWidth = Math.max(2, Math.round(Math.min(baseW, baseH) * 0.004));
+  const style = pickStyle(role);
+  const idx = roleHash(role); // deterministic palette pick per role
 
-  const labelSize = Math.round(Math.min(baseW, baseH) * 0.05);
-  const subLabelSize = Math.round(Math.min(baseW, baseH) * 0.028);
+  switch (style) {
+    case "block":
+      return renderBlock(baseW, baseH, palette, idx, role);
+    case "logo":
+      return renderLogo(baseW, baseH, palette);
+    case "gradient":
+    default:
+      return renderGradient(baseW, baseH, palette, idx);
+  }
+}
 
-  const lines = [
+type PlaceholderStyle = "gradient" | "block" | "logo";
+
+function pickStyle(role: string): PlaceholderStyle {
+  const r = role.toLowerCase();
+  if (/(category|tile|feature|card)/.test(r)) return "block";
+  if (/(logo|payment|press|brand)/.test(r)) return "logo";
+  return "gradient";
+}
+
+/**
+ * Stable [0, 1, 2, 3] index from a role string. Lets us rotate which
+ * brand color a role uses without anything random — same role always
+ * gets the same color.
+ */
+function roleHash(role: string): number {
+  let h = 0;
+  for (const ch of role) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return h % 4;
+}
+
+/**
+ * Soft diagonal gradient between two palette colors. Adds a low-opacity
+ * abstract wave for visual interest without dominating.
+ */
+function renderGradient(
+  baseW: number,
+  baseH: number,
+  palette: PlaceholderPalette,
+  idx: number,
+): string {
+  // Pair light + dark from the palette so the gradient has body.
+  const stops: Array<[string, string]> = [
+    [palette.background, palette.primary],
+    [palette.backgroundAlt, palette.foreground],
+    [palette.primary, palette.foreground],
+    [palette.background, palette.backgroundAlt],
+  ];
+  const [from, to] = stops[idx % stops.length]!;
+  const waveOpacity = 0.18;
+
+  return [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${baseW} ${baseH}" width="${baseW}" height="${baseH}" preserveAspectRatio="xMidYMid slice">`,
-    `  <rect width="${baseW}" height="${baseH}" fill="${palette.backgroundAlt}"/>`,
-    `  <rect x="${inset}" y="${inset}" width="${baseW - inset * 2}" height="${baseH - inset * 2}" fill="none" stroke="${palette.muted}" stroke-width="${frameStrokeWidth}" stroke-dasharray="${frameStrokeWidth * 4} ${frameStrokeWidth * 3}" opacity="0.5"/>`,
-    `  <g font-family="system-ui, -apple-system, 'Segoe UI', sans-serif" text-anchor="middle">`,
-    `    <text x="${baseW / 2}" y="${baseH / 2 - labelSize * 0.15}" font-size="${labelSize}" font-weight="500" fill="${palette.foreground}" opacity="0.85">${escape(role)}</text>`,
-    `    <text x="${baseW / 2}" y="${baseH / 2 + labelSize * 0.95}" font-size="${subLabelSize}" font-weight="400" fill="${palette.muted}">${escape(aspect)} · placeholder</text>`,
-    `  </g>`,
+    `  <defs>`,
+    `    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">`,
+    `      <stop offset="0" stop-color="${from}"/>`,
+    `      <stop offset="1" stop-color="${to}"/>`,
+    `    </linearGradient>`,
+    `  </defs>`,
+    `  <rect width="${baseW}" height="${baseH}" fill="url(#g)"/>`,
+    // Soft wave/curve — anchors the eye without becoming decoration
+    `  <path d="M0,${baseH * 0.7} C${baseW * 0.25},${baseH * 0.55} ${baseW * 0.55},${baseH * 0.85} ${baseW},${baseH * 0.65} L${baseW},${baseH} L0,${baseH} Z" fill="${to}" opacity="${waveOpacity}"/>`,
     `</svg>`,
     "",
-  ];
-  return lines.join("\n");
+  ].join("\n");
+}
+
+/**
+ * Flat brand color block with a small centered geometric mark. Reads as
+ * a category card or feature tile.
+ */
+function renderBlock(
+  baseW: number,
+  baseH: number,
+  palette: PlaceholderPalette,
+  idx: number,
+  role: string,
+): string {
+  // Rotate through the chromatic palette colors per role so a 3-up of
+  // category tiles ends up with three distinct colors.
+  const colors = [palette.primary, palette.foreground, palette.backgroundAlt, palette.muted];
+  const fill = colors[idx % colors.length]!;
+  const isLight = isLightColor(fill);
+  const accent = isLight ? palette.foreground : palette.background;
+  const minDim = Math.min(baseW, baseH);
+  const markSize = minDim * 0.18;
+  const cx = baseW / 2;
+  const cy = baseH / 2;
+
+  // Pick a glyph based on role so the set of category tiles reads as
+  // a group of related-but-distinct categories rather than identical
+  // squares.
+  const glyph = pickGlyph(role, cx, cy, markSize, accent);
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${baseW} ${baseH}" width="${baseW}" height="${baseH}" preserveAspectRatio="xMidYMid slice">`,
+    `  <rect width="${baseW}" height="${baseH}" fill="${fill}"/>`,
+    `  ${glyph}`,
+    `</svg>`,
+    "",
+  ].join("\n");
+}
+
+/**
+ * Muted backdrop with a simple wordmark-style block — for press logos,
+ * payment icons, brand placeholders.
+ */
+function renderLogo(baseW: number, baseH: number, palette: PlaceholderPalette): string {
+  const minDim = Math.min(baseW, baseH);
+  const barW = baseW * 0.45;
+  const barH = minDim * 0.14;
+  const cx = baseW / 2;
+  const cy = baseH / 2;
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${baseW} ${baseH}" width="${baseW}" height="${baseH}" preserveAspectRatio="xMidYMid slice">`,
+    `  <rect width="${baseW}" height="${baseH}" fill="${palette.backgroundAlt}"/>`,
+    `  <rect x="${cx - barW / 2}" y="${cy - barH / 2}" width="${barW}" height="${barH}" rx="${barH * 0.2}" fill="${palette.foreground}" opacity="0.55"/>`,
+    `</svg>`,
+    "",
+  ].join("\n");
+}
+
+function pickGlyph(role: string, cx: number, cy: number, size: number, color: string): string {
+  const r = role.toLowerCase();
+  if (/(square|tile|category|feature|card)/.test(r)) {
+    // Concentric squares
+    return `<rect x="${cx - size / 2}" y="${cy - size / 2}" width="${size}" height="${size}" fill="none" stroke="${color}" stroke-width="${size * 0.05}" opacity="0.7"/><rect x="${cx - size / 4}" y="${cy - size / 4}" width="${size / 2}" height="${size / 2}" fill="${color}" opacity="0.7"/>`;
+  }
+  // Default: outline circle + filled disc, reads as a generic mark
+  return `<circle cx="${cx}" cy="${cy}" r="${size / 2}" fill="none" stroke="${color}" stroke-width="${size * 0.05}" opacity="0.7"/><circle cx="${cx}" cy="${cy}" r="${size / 4}" fill="${color}" opacity="0.7"/>`;
+}
+
+/** Rough perceived-luminance check (WCAG-ish). */
+function isLightColor(hex: string): boolean {
+  const m = /^#([0-9a-fA-F]{6})$/.exec(hex);
+  if (!m) return true;
+  const v = m[1]!;
+  const r = parseInt(v.slice(0, 2), 16);
+  const g = parseInt(v.slice(2, 4), 16);
+  const b = parseInt(v.slice(4, 6), 16);
+  return 0.299 * r + 0.587 * g + 0.114 * b > 140;
 }
 
 function parseAspect(aspect: string): [number, number] {

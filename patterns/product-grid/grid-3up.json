@@ -2,7 +2,7 @@
   "id": "grid-3up",
   "name": "Product Grid — Three Up",
   "category": "product-grid",
-  "description": "Three featured products in a row using the WooCommerce Product Collection block. Wraps to two-up at tablet and one-up at mobile.",
+  "description": "Three featured products in a row using the modern WooCommerce Product Collection block. Wraps to two-up at tablet and one-up at mobile. Each product card shows image (with sale badge), title, and price.",
 
   "compatible_templates": ["index", "front-page", "archive-product", "page"],
   "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal"],
@@ -57,16 +57,47 @@
           "gap": "blank",
           "attrs": {
             "queryId": 0,
-            "displayLayout": { "type": "flex", "columns": 3, "shrinkColumns": true },
-            "query": { "perPage": 3, "pages": 0, "offset": 0, "postType": "product", "order": "desc", "orderBy": "date" }
+            "query": {
+              "perPage": 3,
+              "pages": 0,
+              "offset": 0,
+              "postType": "product",
+              "order": "desc",
+              "orderBy": "date",
+              "search": "",
+              "exclude": [],
+              "inherit": false,
+              "taxQuery": {},
+              "isProductCollectionBlock": true,
+              "woocommerceOnSale": false,
+              "woocommerceStockStatus": ["instock", "outofstock", "onbackorder"],
+              "woocommerceAttributes": [],
+              "woocommerceHandPickedProducts": []
+            },
+            "tagName": "div",
+            "dimensions": { "widthType": "fill", "fixedWidth": "" },
+            "displayLayout": { "type": "flex", "columns": 3 },
+            "align": "wide"
           },
           "innerBlocks": [
             {
-              "name": "core/post-template",
+              "name": "woocommerce/product-template",
               "innerBlocks": [
-                { "name": "woocommerce/product-image", "attrs": { "imageSizing": "cropped", "aspectRatio": "1" } },
-                { "name": "core/post-title", "attrs": { "level": 3, "fontSize": "medium", "isLink": true } },
-                { "name": "woocommerce/product-price" }
+                {
+                  "name": "woocommerce/product-image",
+                  "attrs": { "showSaleBadge": true, "aspectRatio": "1", "imageSizing": "thumbnail", "isDescendentOfQueryLoop": true },
+                  "innerBlocks": [
+                    { "name": "woocommerce/product-sale-badge", "attrs": { "isDescendentOfQueryLoop": true, "align": "right" } }
+                  ]
+                },
+                {
+                  "name": "core/post-title",
+                  "attrs": { "level": 3, "isLink": true, "fontSize": "medium", "__woocommerceNamespace": "woocommerce/product-collection/product-title" }
+                },
+                {
+                  "name": "woocommerce/product-price",
+                  "attrs": { "isDescendentOfQueryLoop": true, "fontSize": "small" }
+                }
               ]
             }
           ]

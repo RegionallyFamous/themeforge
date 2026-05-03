@@ -6,8 +6,9 @@ dist/
 .env.local
 .env.*.local
 
-# Build artifacts
-output/
+# Build artifacts (anchored to repo root — `samples/*/output/` is the
+# committed hand-built reference, distinct from generated `/output`)
+/output/
 .forge-runs/
 .forge-drafts/
 .forge-log/
