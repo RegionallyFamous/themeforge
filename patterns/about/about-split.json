@@ -1,0 +1,74 @@
+{
+  "id": "about-split",
+  "name": "About — Split",
+  "category": "about",
+  "description": "Two-column 'about / our story' section. Image left, headline + body + secondary CTA right. Useful below the hero on a homepage or as the body of an about page.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal"],
+
+  "slots": {
+    "story_image":  { "type": "image_role", "role": "story_lifestyle", "aspect": "4:5" },
+    "eyebrow":      { "type": "text", "max_chars": 30,  "tone": "microcopy" },
+    "headline":     { "type": "text", "max_chars": 60,  "tone": "hero" },
+    "body":         { "type": "text", "max_chars": 480, "tone": "body" },
+    "cta_label":    { "type": "text", "max_chars": 24,  "tone": "cta" },
+    "cta_url":      { "type": "url",  "default": "/about" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "verticalAlignment": "center", "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "attrs": { "width": "45%" },
+              "innerBlocks": [
+                { "name": "core/image", "attrs": { "sizeSlug": "large", "aspectRatio": "4/5" }, "slot": "story_image" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "attrs": { "width": "55%", "verticalAlignment": "center" },
+              "innerBlocks": [
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },     "slot": "eyebrow" },
+                { "name": "core/heading",   "attrs": { "level": 2, "fontSize": "x-large" },             "slot": "headline" },
+                { "name": "core/paragraph", "slot": "body" },
+                {
+                  "name": "core/buttons",
+                  "innerBlocks": [
+                    {
+                      "name": "core/button",
+                      "attrs": { "backgroundColor": "primary", "textColor": "background" },
+                      "slot": { "text": "cta_label", "url": "cta_url" }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

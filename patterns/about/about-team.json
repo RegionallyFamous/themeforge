@@ -1,0 +1,62 @@
+{
+  "id": "about-team",
+  "name": "About — Team",
+  "category": "about",
+  "description": "Grid of team-member portraits with name, role, and short bio. Repeater-driven so the team size is fluid (4–8 members). For about pages or 'meet the makers' sections.",
+
+  "compatible_templates": ["page", "front-page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "playful", "sport"],
+
+  "slots": {
+    "section_heading": { "type": "text", "max_chars": 60, "tone": "hero" },
+    "section_blurb":   { "type": "text", "max_chars": 200, "tone": "supporting" },
+
+    "members": {
+      "type": "repeater",
+      "min": 3,
+      "max": 8,
+      "items": {
+        "headshot": { "type": "image_role", "role": "team_headshot", "aspect": "1:1" },
+        "name":     { "type": "text", "max_chars": 60,  "tone": "hero" },
+        "role":     { "type": "text", "max_chars": 60,  "tone": "microcopy" },
+        "bio":      { "type": "text", "max_chars": 200, "tone": "body" }
+      }
+    }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/group",
+          "attrs": { "layout": { "type": "constrained", "contentSize": "640px" } },
+          "innerBlocks": [
+            { "name": "core/heading",   "attrs": { "level": 2, "fontSize": "x-large" }, "slot": "section_heading" },
+            { "name": "core/paragraph", "slot": "section_blurb" }
+          ]
+        },
+        {
+          "name": "forge/team-grid",
+          "gap": "blank",
+          "slot": "members"
+        }
+      ]
+    }
+  ]
+}

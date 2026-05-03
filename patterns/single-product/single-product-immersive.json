@@ -1,0 +1,56 @@
+{
+  "id": "single-product-immersive",
+  "name": "Single Product — Immersive",
+  "category": "single-product",
+  "description": "Full-bleed product image up top, title + price + add-to-cart in a centered block beneath. Summary and meta below. Reads as fashion / lux / heritage; not for catalog-heavy stores.",
+
+  "compatible_templates": ["single-product"],
+  "compatible_moods": ["editorial", "heritage", "lux-mono", "apothecary", "botanical", "coastal"],
+
+  "slots": {
+    "trust_microcopy": { "type": "text", "max_chars": 80, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "woocommerce/product-image",
+          "attrs": { "imageSizing": "single", "aspectRatio": "16/9", "align": "full" }
+        },
+        {
+          "name": "core/group",
+          "gap": "blank",
+          "attrs": {
+            "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+            "layout": { "type": "constrained", "contentSize": "640px" }
+          },
+          "innerBlocks": [
+            { "name": "core/post-title",         "attrs": { "level": 1, "textAlign": "center", "fontSize": "huge" } },
+            { "name": "woocommerce/product-price", "attrs": { "fontSize": "large" } },
+            { "name": "woocommerce/product-summary" },
+            { "name": "woocommerce/add-to-cart-form" },
+            { "name": "core/separator",          "attrs": { "opacity": "css" } },
+            { "name": "core/paragraph",          "attrs": { "fontSize": "small", "textColor": "muted", "align": "center" }, "slot": "trust_microcopy" }
+          ]
+        }
+      ]
+    }
+  ]
+}

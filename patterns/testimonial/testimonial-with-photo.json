@@ -1,0 +1,61 @@
+{
+  "id": "testimonial-with-photo",
+  "name": "Testimonial — With Photo",
+  "category": "testimonial",
+  "description": "Customer headshot left, large quote and attribution right. The most personal of the testimonial patterns — works when the brand has a real customer story to feature.",
+
+  "compatible_templates": ["index", "front-page", "page", "single-product"],
+  "compatible_moods": ["editorial", "heritage", "lux-mono", "apothecary", "botanical", "coastal", "playful"],
+
+  "slots": {
+    "headshot":     { "type": "image_role", "role": "customer_headshot", "aspect": "1:1" },
+    "quote_text":   { "type": "text", "max_chars": 280, "tone": "hero" },
+    "attribution":  { "type": "text", "max_chars": 60,  "tone": "microcopy" },
+    "credential":   { "type": "text", "max_chars": 80,  "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained", "contentSize": "920px" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "verticalAlignment": "center" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "attrs": { "width": "30%" },
+              "innerBlocks": [
+                { "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "1/1" }, "slot": "headshot" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "attrs": { "width": "70%", "verticalAlignment": "center" },
+              "innerBlocks": [
+                { "name": "core/paragraph", "attrs": { "fontSize": "x-large" },                                "slot": "quote_text" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },             "slot": "attribution" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },             "slot": "credential" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

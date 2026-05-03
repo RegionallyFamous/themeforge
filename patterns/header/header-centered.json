@@ -1,0 +1,45 @@
+{
+  "id": "header-centered",
+  "name": "Header — Centered",
+  "category": "header",
+  "description": "Site title centered above a centered navigation row. Reads more boutique / lux than the classic split. Best for narrow-column editorial moods.",
+
+  "compatible_templates": ["parts/header"],
+  "compatible_moods": ["editorial", "heritage", "lux-mono", "apothecary", "botanical", "nordic"],
+
+  "slots": {},
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "typography.heading",
+    "typography.body",
+    "spacing.40"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "header",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|40", "bottom": "var:preset|spacing|30" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/group",
+          "attrs": { "layout": { "type": "constrained", "contentSize": "640px", "justifyContent": "center" } },
+          "innerBlocks": [
+            { "name": "core/site-title", "attrs": { "level": 0, "textAlign": "center", "fontSize": "large" } },
+            { "name": "core/navigation", "attrs": { "layout": { "type": "flex", "justifyContent": "center" }, "fontSize": "small" } }
+          ]
+        },
+        {
+          "name": "core/separator",
+          "attrs": { "opacity": "css", "className": "is-style-default" }
+        }
+      ]
+    }
+  ]
+}

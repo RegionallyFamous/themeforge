@@ -1,0 +1,78 @@
+{
+  "id": "grid-list",
+  "name": "Product Grid — List",
+  "category": "product-grid",
+  "description": "Vertical list of products (one per row, full width). Useful when each product needs visual breathing room — heritage and apothecary moods especially. Wraps the WooCommerce Product Collection block.",
+
+  "compatible_templates": ["index", "front-page", "archive-product", "page"],
+  "compatible_moods": ["heritage", "apothecary", "editorial", "lux-mono", "botanical"],
+
+  "slots": {
+    "section_eyebrow": { "type": "text", "max_chars": 30,  "tone": "microcopy" },
+    "section_heading": { "type": "text", "max_chars": 60,  "tone": "hero" },
+    "section_blurb":   { "type": "text", "max_chars": 180, "tone": "supporting" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/group",
+          "attrs": { "layout": { "type": "constrained", "contentSize": "640px" } },
+          "innerBlocks": [
+            {
+              "name": "core/paragraph",
+              "attrs": { "fontSize": "small", "textColor": "muted" },
+              "slot": "section_eyebrow"
+            },
+            {
+              "name": "core/heading",
+              "attrs": { "level": 2, "fontSize": "x-large" },
+              "slot": "section_heading"
+            },
+            {
+              "name": "core/paragraph",
+              "slot": "section_blurb"
+            }
+          ]
+        },
+        {
+          "name": "woocommerce/product-collection",
+          "gap": "blank",
+          "attrs": {
+            "queryId": 0,
+            "displayLayout": { "type": "list", "columns": 1 },
+            "query": { "perPage": 6, "pages": 0, "offset": 0, "postType": "product", "order": "desc", "orderBy": "date" }
+          },
+          "innerBlocks": [
+            {
+              "name": "core/post-template",
+              "innerBlocks": [
+                { "name": "woocommerce/product-image", "attrs": { "imageSizing": "cropped", "aspectRatio": "1" } },
+                { "name": "core/post-title", "attrs": { "level": 3, "fontSize": "medium", "isLink": true } },
+                { "name": "woocommerce/product-price" },
+                { "name": "core/post-excerpt", "attrs": { "moreText": "Read more" } }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

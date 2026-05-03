@@ -1,0 +1,44 @@
+{
+  "id": "usp-row-five",
+  "name": "USP Strip — Five Inline",
+  "category": "usp-strip",
+  "description": "Five short value props on one line, separated by middle-dot bullets. Microcopy only — no headings, no bodies. Reads as a trust band; sits well above the footer or directly under the header.",
+
+  "compatible_templates": ["index", "front-page", "page", "single-product", "archive-product"],
+  "compatible_moods": ["editorial", "nordic", "lux-mono", "playful", "sport", "sci", "coastal", "brutalist"],
+
+  "slots": {
+    "items": {
+      "type": "repeater",
+      "min": 3,
+      "max": 6,
+      "items": {
+        "label": { "type": "text", "max_chars": 36, "tone": "microcopy" }
+      }
+    }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.muted",
+    "typography.body",
+    "spacing.30"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|30", "bottom": "var:preset|spacing|30" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        { "name": "forge/marquee-strip", "slot": "items" }
+      ]
+    }
+  ]
+}

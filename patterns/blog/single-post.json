@@ -1,0 +1,40 @@
+{
+  "id": "single-post",
+  "name": "Blog — Single Post",
+  "category": "blog",
+  "description": "Body layout for an individual blog post. Featured image up top, title + date below, then post content. For stores that blog about process / origin / craft.",
+
+  "compatible_templates": ["page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "apothecary", "botanical", "coastal", "lux-mono"],
+
+  "slots": {},
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "article",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained", "contentSize": "720px" }
+      },
+      "innerBlocks": [
+        { "name": "core/post-featured-image", "attrs": { "aspectRatio": "16/9" } },
+        { "name": "core/post-title",          "attrs": { "level": 1, "fontSize": "huge" } },
+        { "name": "core/post-date",           "attrs": { "fontSize": "small", "textColor": "muted" } },
+        { "name": "core/post-author",         "attrs": { "fontSize": "small", "textColor": "muted" } },
+        { "name": "core/separator",           "attrs": { "opacity": "css" } },
+        { "name": "core/post-content" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "name": "woo-theme-forge",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Internal production tool that generates sellable WooCommerce block themes from a brand spec.",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "forge": "tsx src/cli/index.ts",
+    "forge:new": "tsx src/cli/index.ts new",
+    "forge:build": "tsx src/cli/index.ts build",
+    "pattern:check": "tsx src/cli/index.ts pattern check",
+    "pattern:import": "tsx src/cli/index.ts pattern import",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.30.0",
+    "@inquirer/prompts": "^5.0.0",
+    "@wordpress/block-serialization-default-parser": "^5.0.0",
+    "archiver": "^7.0.0",
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.0",
+    "node-vibrant": "^3.2.1-alpha.1",
+    "ora": "^8.0.0",
+    "zod": "^3.23.0",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.0",
+    "@types/node": "^20.12.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "eslint": "^8.57.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.5.0"
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "id": "faq-flat",
+  "name": "FAQ — Flat",
+  "category": "faq",
+  "description": "Question + answer pairs as a stack of flat sections — no expand/collapse. Better than the accordion for short FAQs (4–6 items) where readers benefit from seeing all answers at once.",
+
+  "compatible_templates": ["page", "single-product", "front-page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "sport", "sci"],
+
+  "slots": {
+    "section_heading": { "type": "text", "max_chars": 60, "tone": "hero" },
+
+    "faq_1_q": { "type": "text", "max_chars": 120, "tone": "supporting" },
+    "faq_1_a": { "type": "text", "max_chars": 480, "tone": "body" },
+    "faq_2_q": { "type": "text", "max_chars": 120, "tone": "supporting" },
+    "faq_2_a": { "type": "text", "max_chars": 480, "tone": "body" },
+    "faq_3_q": { "type": "text", "max_chars": 120, "tone": "supporting" },
+    "faq_3_a": { "type": "text", "max_chars": 480, "tone": "body" },
+    "faq_4_q": { "type": "text", "max_chars": 120, "tone": "supporting" },
+    "faq_4_a": { "type": "text", "max_chars": 480, "tone": "body" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained", "contentSize": "720px" }
+      },
+      "innerBlocks": [
+        { "name": "core/heading",   "attrs": { "level": 2, "fontSize": "x-large" }, "slot": "section_heading" },
+
+        { "name": "core/heading",   "attrs": { "level": 3, "fontSize": "medium" }, "slot": "faq_1_q" },
+        { "name": "core/paragraph", "slot": "faq_1_a" },
+        { "name": "core/heading",   "attrs": { "level": 3, "fontSize": "medium" }, "slot": "faq_2_q" },
+        { "name": "core/paragraph", "slot": "faq_2_a" },
+        { "name": "core/heading",   "attrs": { "level": 3, "fontSize": "medium" }, "slot": "faq_3_q" },
+        { "name": "core/paragraph", "slot": "faq_3_a" },
+        { "name": "core/heading",   "attrs": { "level": 3, "fontSize": "medium" }, "slot": "faq_4_q" },
+        { "name": "core/paragraph", "slot": "faq_4_a" }
+      ]
+    }
+  ]
+}

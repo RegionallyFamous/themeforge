@@ -1,0 +1,101 @@
+{
+  "id": "footer-rich",
+  "name": "Footer — Rich",
+  "category": "footer",
+  "description": "Four-column footer: brand blurb, shop links, support links, newsletter signup. Bottom row has copyright and legal links.",
+
+  "compatible_templates": ["parts/footer"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "sport", "playful"],
+
+  "slots": {
+    "brand_blurb": { "type": "text", "max_chars": 200, "tone": "supporting" },
+    "shop_links": {
+      "type": "repeater",
+      "min": 3,
+      "max": 6,
+      "items": {
+        "label": { "type": "text", "max_chars": 30, "tone": "cta" },
+        "url":   { "type": "url" }
+      }
+    },
+    "support_links": {
+      "type": "repeater",
+      "min": 3,
+      "max": 5,
+      "items": {
+        "label": { "type": "text", "max_chars": 30, "tone": "cta" },
+        "url":   { "type": "url" }
+      }
+    },
+    "newsletter_blurb": { "type": "text", "max_chars": 120, "tone": "supporting" },
+    "copyright":        { "type": "text", "max_chars": 80,  "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "color.primary",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "footer",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|40" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/site-title", "attrs": { "level": 0, "fontSize": "medium" } },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" }, "slot": "brand_blurb" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/heading", "attrs": { "level": 4, "fontSize": "small" }, "content": "Shop" },
+                { "name": "forge/link-list", "slot": "shop_links" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/heading", "attrs": { "level": 4, "fontSize": "small" }, "content": "Support" },
+                { "name": "forge/link-list", "slot": "support_links" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/heading", "attrs": { "level": 4, "fontSize": "small" }, "content": "Newsletter" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" }, "slot": "newsletter_blurb" },
+                { "name": "core/html", "content": "<form class=\"forge-newsletter\" method=\"post\" action=\"#\"><input type=\"email\" name=\"email\" placeholder=\"you@domain.com\" required><button type=\"submit\">Subscribe</button></form>" }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "core/separator",
+          "attrs": { "opacity": "css", "style": { "spacing": { "margin": { "top": "var:preset|spacing|40", "bottom": "var:preset|spacing|30" } } } }
+        },
+        {
+          "name": "core/paragraph",
+          "attrs": { "fontSize": "small", "textColor": "muted", "align": "center" },
+          "slot": "copyright"
+        }
+      ]
+    }
+  ]
+}

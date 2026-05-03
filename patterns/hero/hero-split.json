@@ -1,0 +1,83 @@
+{
+  "id": "hero-split",
+  "name": "Hero — Split",
+  "category": "hero",
+  "description": "Two-column hero. Copy on the left, single image on the right. Stacks vertically below 768px. Works in editorial, heritage, and minimal moods.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["editorial", "heritage", "lux-mono", "nordic", "apothecary"],
+
+  "slots": {
+    "headline":  { "type": "text", "max_chars": 80,  "tone": "hero" },
+    "subhead":   { "type": "text", "max_chars": 200, "tone": "supporting" },
+    "cta_label": { "type": "text", "max_chars": 24,  "tone": "cta" },
+    "cta_url":   { "type": "url",  "default": "/shop" },
+    "image":     { "type": "image_role", "role": "hero_lifestyle", "aspect": "4:5" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "verticalAlignment": "center", "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "attrs": { "width": "55%", "verticalAlignment": "center" },
+              "innerBlocks": [
+                {
+                  "name": "core/heading",
+                  "attrs": { "level": 1, "fontSize": "huge" },
+                  "slot": "headline"
+                },
+                {
+                  "name": "core/paragraph",
+                  "attrs": { "fontSize": "medium" },
+                  "slot": "subhead"
+                },
+                {
+                  "name": "core/buttons",
+                  "innerBlocks": [
+                    {
+                      "name": "core/button",
+                      "attrs": { "backgroundColor": "primary", "textColor": "background" },
+                      "slot": { "text": "cta_label", "url": "cta_url" }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "core/column",
+              "attrs": { "width": "45%" },
+              "innerBlocks": [
+                {
+                  "name": "core/image",
+                  "attrs": { "sizeSlug": "large", "aspectRatio": "4/5" },
+                  "slot": "image"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

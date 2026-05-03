@@ -1,0 +1,64 @@
+{
+  "id": "footer-trust",
+  "name": "Footer — Trust Strip",
+  "category": "footer",
+  "description": "Brand line on top, a row of payment-method icons below, copyright beneath. For stores leaning on payment-trust signals over comprehensive nav. Compact and reassuring.",
+
+  "compatible_templates": ["parts/footer"],
+  "compatible_moods": ["nordic", "lux-mono", "playful", "sport", "sci"],
+
+  "slots": {
+    "brand_line": { "type": "text", "max_chars": 120, "tone": "supporting" },
+
+    "payment_1": { "type": "image_role", "role": "payment_icon", "aspect": "3:1" },
+    "payment_2": { "type": "image_role", "role": "payment_icon", "aspect": "3:1" },
+    "payment_3": { "type": "image_role", "role": "payment_icon", "aspect": "3:1" },
+    "payment_4": { "type": "image_role", "role": "payment_icon", "aspect": "3:1" },
+
+    "copyright": { "type": "text", "max_chars": 80, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.foreground",
+    "color.muted",
+    "typography.body",
+    "spacing.40"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "footer",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|40", "bottom": "var:preset|spacing|40" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" },
+          "slot": "brand_line"
+        },
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide", "verticalAlignment": "center" },
+          "innerBlocks": [
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "small", "aspectRatio": "3/1" }, "slot": "payment_1" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "small", "aspectRatio": "3/1" }, "slot": "payment_2" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "small", "aspectRatio": "3/1" }, "slot": "payment_3" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "small", "aspectRatio": "3/1" }, "slot": "payment_4" }] }
+          ]
+        },
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" },
+          "slot": "copyright"
+        }
+      ]
+    }
+  ]
+}

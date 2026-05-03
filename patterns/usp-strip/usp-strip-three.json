@@ -1,0 +1,70 @@
+{
+  "id": "usp-strip-three",
+  "name": "USP Strip — Three",
+  "category": "usp-strip",
+  "description": "Three short value-prop columns side by side — title + one-sentence body. Compact vertical rhythm; sits well directly under a hero or above the footer.",
+
+  "compatible_templates": ["index", "front-page", "page", "single-product"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "playful", "sport", "sci"],
+
+  "slots": {
+    "usp_1_title": { "type": "text", "max_chars": 36,  "tone": "cta" },
+    "usp_1_body":  { "type": "text", "max_chars": 120, "tone": "supporting" },
+    "usp_2_title": { "type": "text", "max_chars": 36,  "tone": "cta" },
+    "usp_2_body":  { "type": "text", "max_chars": 120, "tone": "supporting" },
+    "usp_3_title": { "type": "text", "max_chars": 36,  "tone": "cta" },
+    "usp_3_body":  { "type": "text", "max_chars": 120, "tone": "supporting" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|50", "bottom": "var:preset|spacing|50" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/heading", "attrs": { "level": 3, "textAlign": "center", "fontSize": "medium" }, "slot": "usp_1_title" },
+                { "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" }, "slot": "usp_1_body" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/heading", "attrs": { "level": 3, "textAlign": "center", "fontSize": "medium" }, "slot": "usp_2_title" },
+                { "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" }, "slot": "usp_2_body" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/heading", "attrs": { "level": 3, "textAlign": "center", "fontSize": "medium" }, "slot": "usp_3_title" },
+                { "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" }, "slot": "usp_3_body" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

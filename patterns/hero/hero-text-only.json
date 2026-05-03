@@ -1,0 +1,60 @@
+{
+  "id": "hero-text-only",
+  "name": "Hero — Text Only",
+  "category": "hero",
+  "description": "Image-free hero. Big centered headline + subhead + CTA. Used when imagery is weak or distracts from a strong proposition. Particularly good for editorial / lux-mono moods.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["editorial", "heritage", "lux-mono", "nordic", "apothecary", "brutalist", "sci"],
+
+  "slots": {
+    "headline":  { "type": "text", "max_chars": 100, "tone": "hero" },
+    "subhead":   { "type": "text", "max_chars": 200, "tone": "supporting" },
+    "cta_label": { "type": "text", "max_chars": 24,  "tone": "cta" },
+    "cta_url":   { "type": "url",  "default": "/shop" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained", "contentSize": "720px" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/heading",
+          "attrs": { "level": 1, "textAlign": "center", "fontSize": "huge" },
+          "slot": "headline"
+        },
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "large" },
+          "slot": "subhead"
+        },
+        {
+          "name": "core/buttons",
+          "attrs": { "layout": { "type": "flex", "justifyContent": "center" } },
+          "innerBlocks": [
+            {
+              "name": "core/button",
+              "attrs": { "backgroundColor": "primary", "textColor": "background" },
+              "slot": { "text": "cta_label", "url": "cta_url" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

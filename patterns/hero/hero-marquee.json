@@ -1,0 +1,70 @@
+{
+  "id": "hero-marquee",
+  "name": "Hero — Marquee",
+  "category": "hero",
+  "description": "Standard centered hero copy with a kinetic strip of short slogans below. The strip is presentational — wrap it in CSS animation in your child theme to actually scroll. Loud personality without losing the buying flow.",
+
+  "compatible_templates": ["index", "front-page"],
+  "compatible_moods": ["playful", "y2k", "sport", "brutalist"],
+
+  "slots": {
+    "headline":   { "type": "text", "max_chars": 80,  "tone": "hero" },
+    "subhead":    { "type": "text", "max_chars": 200, "tone": "supporting" },
+    "cta_label":  { "type": "text", "max_chars": 24,  "tone": "cta" },
+    "cta_url":    { "type": "url",  "default": "/shop" },
+
+    "marquee_items": {
+      "type": "repeater",
+      "min": 4,
+      "max": 8,
+      "items": {
+        "label": { "type": "text", "max_chars": 36, "tone": "microcopy" }
+      }
+    }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|40" } } },
+        "layout": { "type": "constrained", "contentSize": "720px" }
+      },
+      "innerBlocks": [
+        { "name": "core/heading",   "attrs": { "level": 1, "textAlign": "center", "fontSize": "huge" }, "slot": "headline" },
+        { "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "large" },                "slot": "subhead" },
+        {
+          "name": "core/buttons",
+          "attrs": { "layout": { "type": "flex", "justifyContent": "center" } },
+          "innerBlocks": [
+            { "name": "core/button", "attrs": { "backgroundColor": "primary", "textColor": "background" }, "slot": { "text": "cta_label", "url": "cta_url" } }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "core/group",
+      "gap": "blank",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|30", "bottom": "var:preset|spacing|30" } } }
+      },
+      "innerBlocks": [
+        { "name": "forge/marquee-strip", "slot": "marquee_items" }
+      ]
+    }
+  ]
+}

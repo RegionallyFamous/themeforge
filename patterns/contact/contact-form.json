@@ -1,0 +1,64 @@
+{
+  "id": "contact-form",
+  "name": "Contact — Form + Details",
+  "category": "contact",
+  "description": "Contact details left (heading + body + address microcopy), inline form right (raw HTML — wire to a real form handler in your child theme). For the contact page or as a footer-adjacent section.",
+
+  "compatible_templates": ["page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "playful", "sport", "sci"],
+
+  "slots": {
+    "heading": { "type": "text", "max_chars": 60,  "tone": "hero" },
+    "body":    { "type": "text", "max_chars": 280, "tone": "supporting" },
+    "address": { "type": "text", "max_chars": 160, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide", "verticalAlignment": "top" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "attrs": { "width": "45%" },
+              "innerBlocks": [
+                { "name": "core/heading",   "attrs": { "level": 2, "fontSize": "x-large" }, "slot": "heading" },
+                { "name": "core/paragraph", "slot": "body" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" }, "slot": "address" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "attrs": { "width": "55%" },
+              "innerBlocks": [
+                {
+                  "name": "core/html",
+                  "content": "<form class=\"forge-contact\" method=\"post\" action=\"#\"><label>Name<input type=\"text\" name=\"name\" required></label><label>Email<input type=\"email\" name=\"email\" required></label><label>Message<textarea name=\"message\" rows=\"5\" required></textarea></label><button type=\"submit\">Send</button></form>"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

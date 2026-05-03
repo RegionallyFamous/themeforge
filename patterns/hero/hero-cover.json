@@ -1,0 +1,65 @@
+{
+  "id": "hero-cover",
+  "name": "Hero — Centered Cover",
+  "category": "hero",
+  "description": "Centered hero. Single image above, headline + subhead + CTA stacked below. Generous vertical padding. Reads well at any width without restructuring.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal"],
+
+  "slots": {
+    "hero_image": { "type": "image_role", "role": "hero_centerpiece", "aspect": "16:9" },
+    "headline":   { "type": "text", "max_chars": 80,  "tone": "hero" },
+    "subhead":    { "type": "text", "max_chars": 200, "tone": "supporting" },
+    "cta_label":  { "type": "text", "max_chars": 24,  "tone": "cta" },
+    "cta_url":    { "type": "url",  "default": "/shop" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained", "contentSize": "800px" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/image",
+          "attrs": { "sizeSlug": "large", "aspectRatio": "16/9" },
+          "slot": "hero_image"
+        },
+        {
+          "name": "core/heading",
+          "attrs": { "level": 1, "textAlign": "center", "fontSize": "huge" },
+          "slot": "headline"
+        },
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "medium" },
+          "slot": "subhead"
+        },
+        {
+          "name": "core/buttons",
+          "innerBlocks": [
+            {
+              "name": "core/button",
+              "attrs": { "backgroundColor": "primary", "textColor": "background" },
+              "slot": { "text": "cta_label", "url": "cta_url" }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

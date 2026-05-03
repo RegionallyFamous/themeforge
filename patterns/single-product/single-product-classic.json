@@ -1,0 +1,66 @@
+{
+  "id": "single-product-classic",
+  "name": "Single Product — Classic",
+  "category": "single-product",
+  "description": "Classic two-column product detail layout. Image on the left, title + price + summary + add-to-cart on the right, plus a microcopy line for shipping/returns trust.",
+
+  "compatible_templates": ["single-product"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "playful", "sport"],
+
+  "slots": {
+    "trust_microcopy": { "type": "text", "max_chars": 80, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide", "verticalAlignment": "top" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "attrs": { "width": "55%" },
+              "innerBlocks": [
+                { "name": "woocommerce/product-image", "attrs": { "imageSizing": "single", "aspectRatio": "1" } }
+              ]
+            },
+            {
+              "name": "core/column",
+              "attrs": { "width": "45%" },
+              "innerBlocks": [
+                { "name": "core/post-title", "attrs": { "level": 1, "fontSize": "x-large" } },
+                { "name": "woocommerce/product-price", "attrs": { "fontSize": "large" } },
+                { "name": "woocommerce/product-summary" },
+                { "name": "woocommerce/add-to-cart-form" },
+                { "name": "core/separator", "attrs": { "opacity": "css" } },
+                {
+                  "name": "core/paragraph",
+                  "attrs": { "fontSize": "small", "textColor": "muted" },
+                  "slot": "trust_microcopy"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "id": "category-feature",
+  "name": "Category Showcase — Two Feature",
+  "category": "category-showcase",
+  "description": "Two large category cards with editorial body copy under each. The richer of the two category-showcase patterns — for stores where each category warrants its own headline.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["editorial", "heritage", "lux-mono", "apothecary", "botanical", "coastal"],
+
+  "slots": {
+    "section_heading": { "type": "text", "max_chars": 60, "tone": "hero" },
+
+    "cat_1_image":     { "type": "image_role", "role": "category_feature", "aspect": "4:5" },
+    "cat_1_eyebrow":   { "type": "text", "max_chars": 30,  "tone": "microcopy" },
+    "cat_1_label":     { "type": "text", "max_chars": 60,  "tone": "hero" },
+    "cat_1_blurb":     { "type": "text", "max_chars": 200, "tone": "supporting" },
+    "cat_1_cta_label": { "type": "text", "max_chars": 24,  "tone": "cta" },
+    "cat_1_cta_url":   { "type": "url" },
+
+    "cat_2_image":     { "type": "image_role", "role": "category_feature", "aspect": "4:5" },
+    "cat_2_eyebrow":   { "type": "text", "max_chars": 30,  "tone": "microcopy" },
+    "cat_2_label":     { "type": "text", "max_chars": 60,  "tone": "hero" },
+    "cat_2_blurb":     { "type": "text", "max_chars": 200, "tone": "supporting" },
+    "cat_2_cta_label": { "type": "text", "max_chars": 24,  "tone": "cta" },
+    "cat_2_cta_url":   { "type": "url" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/heading",
+          "attrs": { "level": 2, "fontSize": "x-large" },
+          "slot": "section_heading"
+        },
+        {
+          "name": "core/columns",
+          "gap": "blank",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/image",   "attrs": { "sizeSlug": "large", "aspectRatio": "4/5" },     "slot": "cat_1_image" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },   "slot": "cat_1_eyebrow" },
+                { "name": "core/heading", "attrs": { "level": 3, "fontSize": "large" },               "slot": "cat_1_label" },
+                { "name": "core/paragraph", "slot": "cat_1_blurb" },
+                {
+                  "name": "core/buttons",
+                  "innerBlocks": [
+                    { "name": "core/button", "attrs": { "backgroundColor": "primary", "textColor": "background" }, "slot": { "text": "cat_1_cta_label", "url": "cat_1_cta_url" } }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/image",   "attrs": { "sizeSlug": "large", "aspectRatio": "4/5" },     "slot": "cat_2_image" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },   "slot": "cat_2_eyebrow" },
+                { "name": "core/heading", "attrs": { "level": 3, "fontSize": "large" },               "slot": "cat_2_label" },
+                { "name": "core/paragraph", "slot": "cat_2_blurb" },
+                {
+                  "name": "core/buttons",
+                  "innerBlocks": [
+                    { "name": "core/button", "attrs": { "backgroundColor": "primary", "textColor": "background" }, "slot": { "text": "cat_2_cta_label", "url": "cat_2_cta_url" } }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

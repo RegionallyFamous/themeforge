@@ -1,0 +1,63 @@
+{
+  "id": "newsletter-inline",
+  "name": "Newsletter — Inline",
+  "category": "newsletter",
+  "description": "Two-column inline signup. Heading + blurb left, the form right. Reads less like a banner — fits between editorial sections without dominating the rhythm.",
+
+  "compatible_templates": ["index", "front-page", "page", "single-product", "archive-product"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal"],
+
+  "slots": {
+    "heading": { "type": "text", "max_chars": 60,  "tone": "hero" },
+    "blurb":   { "type": "text", "max_chars": 180, "tone": "supporting" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.foreground",
+    "color.primary",
+    "typography.heading",
+    "typography.body",
+    "spacing.50"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|50", "bottom": "var:preset|spacing|50" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide", "verticalAlignment": "center" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "attrs": { "width": "55%", "verticalAlignment": "center" },
+              "innerBlocks": [
+                { "name": "core/heading",   "attrs": { "level": 2, "fontSize": "x-large" }, "slot": "heading" },
+                { "name": "core/paragraph", "slot": "blurb" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "attrs": { "width": "45%", "verticalAlignment": "center" },
+              "innerBlocks": [
+                {
+                  "name": "core/html",
+                  "content": "<form class=\"forge-newsletter forge-newsletter--inline\" method=\"post\" action=\"#\"><input type=\"email\" name=\"email\" placeholder=\"you@domain.com\" required><button type=\"submit\">Subscribe</button></form>"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

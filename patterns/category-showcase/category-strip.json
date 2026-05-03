@@ -1,0 +1,77 @@
+{
+  "id": "category-strip",
+  "name": "Category Showcase — Five Strip",
+  "category": "category-showcase",
+  "description": "Five compact category tiles in a single row. Reads as wayfinding — quick scan rather than visual feature. Best for stores with 5+ catalog tiers (e.g. coffee origins, candle scents).",
+
+  "compatible_templates": ["index", "front-page"],
+  "compatible_moods": ["editorial", "nordic", "lux-mono", "playful", "sport", "coastal"],
+
+  "slots": {
+    "section_heading": { "type": "text", "max_chars": 60, "tone": "hero" },
+
+    "cat_1_image": { "type": "image_role", "role": "category_tile_small", "aspect": "1:1" },
+    "cat_1_label": { "type": "text", "max_chars": 30, "tone": "cta" },
+    "cat_2_image": { "type": "image_role", "role": "category_tile_small", "aspect": "1:1" },
+    "cat_2_label": { "type": "text", "max_chars": 30, "tone": "cta" },
+    "cat_3_image": { "type": "image_role", "role": "category_tile_small", "aspect": "1:1" },
+    "cat_3_label": { "type": "text", "max_chars": 30, "tone": "cta" },
+    "cat_4_image": { "type": "image_role", "role": "category_tile_small", "aspect": "1:1" },
+    "cat_4_label": { "type": "text", "max_chars": 30, "tone": "cta" },
+    "cat_5_image": { "type": "image_role", "role": "category_tile_small", "aspect": "1:1" },
+    "cat_5_label": { "type": "text", "max_chars": 30, "tone": "cta" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "typography.heading",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/heading",
+          "attrs": { "level": 2, "fontSize": "x-large" },
+          "slot": "section_heading"
+        },
+        {
+          "name": "core/columns",
+          "gap": "blank",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            { "name": "core/column", "innerBlocks": [
+              { "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "1/1" }, "slot": "cat_1_image" },
+              { "name": "core/heading", "attrs": { "level": 4, "textAlign": "center", "fontSize": "small" }, "slot": "cat_1_label" }
+            ] },
+            { "name": "core/column", "innerBlocks": [
+              { "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "1/1" }, "slot": "cat_2_image" },
+              { "name": "core/heading", "attrs": { "level": 4, "textAlign": "center", "fontSize": "small" }, "slot": "cat_2_label" }
+            ] },
+            { "name": "core/column", "innerBlocks": [
+              { "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "1/1" }, "slot": "cat_3_image" },
+              { "name": "core/heading", "attrs": { "level": 4, "textAlign": "center", "fontSize": "small" }, "slot": "cat_3_label" }
+            ] },
+            { "name": "core/column", "innerBlocks": [
+              { "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "1/1" }, "slot": "cat_4_image" },
+              { "name": "core/heading", "attrs": { "level": 4, "textAlign": "center", "fontSize": "small" }, "slot": "cat_4_label" }
+            ] },
+            { "name": "core/column", "innerBlocks": [
+              { "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "1/1" }, "slot": "cat_5_image" },
+              { "name": "core/heading", "attrs": { "level": 4, "textAlign": "center", "fontSize": "small" }, "slot": "cat_5_label" }
+            ] }
+          ]
+        }
+      ]
+    }
+  ]
+}

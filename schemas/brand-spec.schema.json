@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://woo-theme-forge.local/schemas/brand-spec.schema.json",
+  "title": "BrandSpec",
+  "description": "Operator-authored brief that drives a theme build.",
+  "type": "object",
+  "required": ["version", "store", "voice", "audience", "mood", "color", "typography", "density"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "const": 1 },
+
+    "store": {
+      "type": "object",
+      "required": ["name", "tagline", "description", "niche"],
+      "additionalProperties": false,
+      "properties": {
+        "name":        { "type": "string", "minLength": 1, "maxLength": 60 },
+        "tagline":     { "type": "string", "minLength": 1, "maxLength": 120 },
+        "description": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "niche":       { "type": "string", "minLength": 1, "maxLength": 60 }
+      }
+    },
+
+    "voice": {
+      "type": "object",
+      "required": ["formality", "playfulness", "premiumness"],
+      "additionalProperties": false,
+      "properties": {
+        "formality":   { "type": "integer", "minimum": 1, "maximum": 5 },
+        "playfulness": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "premiumness": { "type": "integer", "minimum": 1, "maximum": 5 }
+      }
+    },
+
+    "audience": {
+      "type": "object",
+      "required": ["description"],
+      "additionalProperties": false,
+      "properties": {
+        "description": { "type": "string", "minLength": 1, "maxLength": 240 }
+      }
+    },
+
+    "mood": {
+      "type": "object",
+      "required": ["primary"],
+      "additionalProperties": false,
+      "properties": {
+        "primary":   { "$ref": "#/$defs/MoodArchetype" },
+        "secondary": { "$ref": "#/$defs/MoodArchetype" }
+      }
+    },
+
+    "color": {
+      "type": "object",
+      "required": ["source", "palette", "base"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "enum": ["palette_card", "hex_input", "logo_extract"] },
+        "palette": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 6,
+          "items": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" }
+        },
+        "base": { "enum": ["light", "dark"] }
+      }
+    },
+
+    "typography": {
+      "type": "object",
+      "required": ["pairing"],
+      "additionalProperties": false,
+      "properties": {
+        "pairing": {
+          "enum": ["modern_sans", "elegant_serif", "editorial_mix", "industrial", "humanist", "surprise_me"]
+        },
+        "headline_font": { "type": "string" },
+        "body_font":     { "type": "string" }
+      }
+    },
+
+    "density": { "enum": ["airy", "balanced", "dense"] },
+
+    "references": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["url"],
+        "additionalProperties": false,
+        "properties": {
+          "url":   { "type": "string", "format": "uri" },
+          "notes": { "type": "string", "maxLength": 240 }
+        }
+      }
+    },
+
+    "locale": { "type": "string", "pattern": "^[a-z]{2}_[A-Z]{2}$", "default": "en_US" }
+  },
+
+  "$defs": {
+    "MoodArchetype": {
+      "enum": [
+        "apothecary",
+        "editorial",
+        "brutalist",
+        "botanical",
+        "heritage",
+        "nordic",
+        "playful",
+        "y2k",
+        "sport",
+        "lux-mono",
+        "coastal",
+        "sci"
+      ]
+    }
+  }
+}

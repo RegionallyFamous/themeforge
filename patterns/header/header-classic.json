@@ -1,0 +1,47 @@
+{
+  "id": "header-classic",
+  "name": "Header — Classic",
+  "category": "header",
+  "description": "Site title left, navigation right, hairline separator below. The default header for editorial / heritage / nordic moods. Mirrors the orchestrator's hardcoded skeleton so behavior is identical when the planner picks this.",
+
+  "compatible_templates": ["parts/header"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "sci"],
+
+  "slots": {},
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "typography.body",
+    "spacing.30"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "header",
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/group",
+          "attrs": {
+            "align": "wide",
+            "style": { "spacing": { "padding": { "top": "var:preset|spacing|30", "bottom": "var:preset|spacing|30" } } },
+            "layout": { "type": "flex", "justifyContent": "space-between" }
+          },
+          "innerBlocks": [
+            { "name": "core/site-title", "attrs": { "level": 0, "fontSize": "medium" } },
+            { "name": "core/navigation", "attrs": { "layout": { "type": "flex", "justifyContent": "right" }, "fontSize": "small" } }
+          ]
+        },
+        {
+          "name": "core/separator",
+          "attrs": { "opacity": "css", "className": "is-style-default" }
+        }
+      ]
+    }
+  ]
+}

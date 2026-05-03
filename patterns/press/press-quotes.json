@@ -1,0 +1,70 @@
+{
+  "id": "press-quotes",
+  "name": "Press — Two Quotes",
+  "category": "press",
+  "description": "Two press quotes with publication attribution. More substantial than the logo strip — for stores with editorial coverage worth quoting.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["editorial", "heritage", "lux-mono", "apothecary", "botanical", "sport"],
+
+  "slots": {
+    "section_eyebrow": { "type": "text", "max_chars": 40, "tone": "microcopy" },
+
+    "quote_1_text":  { "type": "text", "max_chars": 240, "tone": "hero" },
+    "quote_1_publication": { "type": "text", "max_chars": 60, "tone": "microcopy" },
+
+    "quote_2_text":  { "type": "text", "max_chars": 240, "tone": "hero" },
+    "quote_2_publication": { "type": "text", "max_chars": 60, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" },
+          "slot": "section_eyebrow"
+        },
+        {
+          "name": "core/columns",
+          "gap": "blank",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/paragraph", "attrs": { "fontSize": "large" },                          "slot": "quote_1_text" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },     "slot": "quote_1_publication" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/paragraph", "attrs": { "fontSize": "large" },                          "slot": "quote_2_text" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },     "slot": "quote_2_publication" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

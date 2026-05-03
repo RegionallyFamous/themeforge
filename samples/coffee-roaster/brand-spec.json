@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "store": {
+    "name": "Bellwether Coffee",
+    "tagline": "Single-origin coffee, slow-roasted in small batches.",
+    "description": "Bellwether is a small-batch specialty coffee roaster sourcing single-origin beans from named farms across Ethiopia, Colombia, and Guatemala. We roast on a 5kg drum roaster three days a week and ship within 48 hours of the roast.",
+    "niche": "specialty coffee"
+  },
+  "voice": {
+    "formality": 3,
+    "playfulness": 2,
+    "premiumness": 4
+  },
+  "audience": {
+    "description": "Home brewers and cafes who care about traceability, freshness, and the craft of roasting more than convenience or volume."
+  },
+  "mood": {
+    "primary": "heritage",
+    "secondary": "editorial"
+  },
+  "color": {
+    "source": "palette_card",
+    "palette": ["#2E1F14", "#A8531E", "#E8D9C2", "#F6F1EA", "#1A1A1A"],
+    "base": "light"
+  },
+  "typography": {
+    "pairing": "editorial_mix",
+    "headline_font": "Fraunces",
+    "body_font": "Inter"
+  },
+  "density": "airy",
+  "references": [
+    { "url": "https://www.heartroasters.com", "notes": "Editorial product cards, restrained palette, generous whitespace." },
+    { "url": "https://www.workshopcoffee.com", "notes": "Strong typographic hierarchy, photography-led hero." }
+  ],
+  "locale": "en_US"
+}

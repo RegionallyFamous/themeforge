@@ -1,0 +1,28 @@
+node_modules/
+dist/
+
+# Secrets
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+output/
+.forge-runs/
+.forge-drafts/
+.forge-log/
+
+# Test / TS caches
+coverage/
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors / IDEs / tooling
+.vscode/
+.idea/
+.claude/
+*.swp
+*.log

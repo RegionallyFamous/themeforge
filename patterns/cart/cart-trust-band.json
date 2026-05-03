@@ -1,0 +1,47 @@
+{
+  "id": "cart-trust-band",
+  "name": "Cart — Trust Band",
+  "category": "cart",
+  "description": "Three short reassurance items (free shipping over X, secure checkout, easy returns) designed to sit directly above the woocommerce/cart block. Doesn't restructure the cart — it just adds chrome.",
+
+  "compatible_templates": ["page-cart", "page-checkout"],
+  "compatible_moods": ["editorial", "nordic", "lux-mono", "playful", "sport", "sci", "coastal", "heritage", "apothecary", "botanical"],
+
+  "slots": {
+    "claim_1": { "type": "text", "max_chars": 60, "tone": "microcopy" },
+    "claim_2": { "type": "text", "max_chars": 60, "tone": "microcopy" },
+    "claim_3": { "type": "text", "max_chars": 60, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.muted",
+    "typography.body",
+    "spacing.30"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|30", "bottom": "var:preset|spacing|30" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide", "verticalAlignment": "center" },
+          "innerBlocks": [
+            { "name": "core/column", "innerBlocks": [{ "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" }, "slot": "claim_1" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" }, "slot": "claim_2" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" }, "slot": "claim_3" }] }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "shipping-strip",
+  "name": "Shipping — Trust Band",
+  "category": "shipping",
+  "description": "One-line trust band: a single shipping or returns claim, centered, on a muted background. Sits well directly under the header or above the footer. The simplest pattern in the library.",
+
+  "compatible_templates": ["index", "front-page", "page", "single-product", "archive-product"],
+  "compatible_moods": ["editorial", "nordic", "lux-mono", "playful", "sport", "sci", "coastal", "heritage"],
+
+  "slots": {
+    "claim": { "type": "text", "max_chars": 100, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.muted",
+    "typography.body",
+    "spacing.30"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|30", "bottom": "var:preset|spacing|30" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" },
+          "slot": "claim"
+        }
+      ]
+    }
+  ]
+}

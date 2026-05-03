@@ -1,0 +1,86 @@
+{
+  "id": "category-trio",
+  "name": "Category Showcase — Trio",
+  "category": "category-showcase",
+  "description": "Three category cards in a row, each with a square image and label heading. Stacks vertically below 768px. Use as a wayfinding section between hero and product grid.",
+
+  "compatible_templates": ["index", "front-page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "apothecary", "botanical", "coastal", "playful"],
+
+  "slots": {
+    "section_heading": { "type": "text", "max_chars": 60,  "tone": "hero" },
+    "section_blurb":   { "type": "text", "max_chars": 180, "tone": "supporting" },
+
+    "cat_1_image": { "type": "image_role", "role": "category_tile", "aspect": "1:1" },
+    "cat_1_label": { "type": "text", "max_chars": 40, "tone": "hero" },
+    "cat_2_image": { "type": "image_role", "role": "category_tile", "aspect": "1:1" },
+    "cat_2_label": { "type": "text", "max_chars": 40, "tone": "hero" },
+    "cat_3_image": { "type": "image_role", "role": "category_tile", "aspect": "1:1" },
+    "cat_3_label": { "type": "text", "max_chars": 40, "tone": "hero" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/group",
+          "attrs": { "layout": { "type": "constrained", "contentSize": "640px" } },
+          "innerBlocks": [
+            {
+              "name": "core/heading",
+              "attrs": { "level": 2, "fontSize": "x-large" },
+              "slot": "section_heading"
+            },
+            {
+              "name": "core/paragraph",
+              "slot": "section_blurb"
+            }
+          ]
+        },
+        {
+          "name": "core/columns",
+          "gap": "blank",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/image", "attrs": { "sizeSlug": "large", "aspectRatio": "1/1" }, "slot": "cat_1_image" },
+                { "name": "core/heading", "attrs": { "level": 3, "textAlign": "center", "fontSize": "medium" }, "slot": "cat_1_label" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/image", "attrs": { "sizeSlug": "large", "aspectRatio": "1/1" }, "slot": "cat_2_image" },
+                { "name": "core/heading", "attrs": { "level": 3, "textAlign": "center", "fontSize": "medium" }, "slot": "cat_2_label" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/image", "attrs": { "sizeSlug": "large", "aspectRatio": "1/1" }, "slot": "cat_3_image" },
+                { "name": "core/heading", "attrs": { "level": 3, "textAlign": "center", "fontSize": "medium" }, "slot": "cat_3_label" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "press-strip",
+  "name": "Press — Logo Strip",
+  "category": "press",
+  "description": "A row of 'as seen in' / 'trusted by' logos. Four image slots side by side, anchored by a small eyebrow line above. Subtle backdrop so it reads as social proof rather than decoration.",
+
+  "compatible_templates": ["index", "front-page", "page"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "playful", "sport", "sci"],
+
+  "slots": {
+    "section_eyebrow": { "type": "text", "max_chars": 40, "tone": "microcopy" },
+
+    "logo_1": { "type": "image_role", "role": "press_logo", "aspect": "3:1" },
+    "logo_2": { "type": "image_role", "role": "press_logo", "aspect": "3:1" },
+    "logo_3": { "type": "image_role", "role": "press_logo", "aspect": "3:1" },
+    "logo_4": { "type": "image_role", "role": "press_logo", "aspect": "3:1" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.background-alt",
+    "color.muted",
+    "typography.body",
+    "spacing.50"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "background-alt",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|50", "bottom": "var:preset|spacing|50" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "small", "textColor": "muted" },
+          "slot": "section_eyebrow"
+        },
+        {
+          "name": "core/columns",
+          "attrs": { "align": "wide", "verticalAlignment": "center" },
+          "innerBlocks": [
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "3/1" }, "slot": "logo_1" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "3/1" }, "slot": "logo_2" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "3/1" }, "slot": "logo_3" }] },
+            { "name": "core/column", "innerBlocks": [{ "name": "core/image", "attrs": { "sizeSlug": "medium", "aspectRatio": "3/1" }, "slot": "logo_4" }] }
+          ]
+        }
+      ]
+    }
+  ]
+}

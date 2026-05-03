@@ -1,0 +1,76 @@
+{
+  "id": "testimonial-grid",
+  "name": "Testimonial — Three Up",
+  "category": "testimonial",
+  "description": "Three short customer quotes side by side. Each has a quote and an attribution. Reads as social proof rather than the editorial single pull-quote.",
+
+  "compatible_templates": ["index", "front-page", "page", "single-product"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "playful", "sport", "coastal", "botanical", "apothecary"],
+
+  "slots": {
+    "section_heading": { "type": "text", "max_chars": 60, "tone": "hero" },
+
+    "quote_1_text":   { "type": "text", "max_chars": 220, "tone": "body" },
+    "attribution_1":  { "type": "text", "max_chars": 60,  "tone": "microcopy" },
+    "quote_2_text":   { "type": "text", "max_chars": 220, "tone": "body" },
+    "attribution_2":  { "type": "text", "max_chars": 60,  "tone": "microcopy" },
+    "quote_3_text":   { "type": "text", "max_chars": 220, "tone": "body" },
+    "attribution_3":  { "type": "text", "max_chars": 60,  "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.heading",
+    "typography.body",
+    "spacing.section"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|section", "bottom": "var:preset|spacing|section" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/heading",
+          "attrs": { "level": 2, "textAlign": "center", "fontSize": "x-large" },
+          "slot": "section_heading"
+        },
+        {
+          "name": "core/columns",
+          "gap": "blank",
+          "attrs": { "align": "wide" },
+          "innerBlocks": [
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/paragraph", "attrs": { "fontSize": "medium" },                          "slot": "quote_1_text" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },     "slot": "attribution_1" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/paragraph", "attrs": { "fontSize": "medium" },                          "slot": "quote_2_text" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },     "slot": "attribution_2" }
+              ]
+            },
+            {
+              "name": "core/column",
+              "innerBlocks": [
+                { "name": "core/paragraph", "attrs": { "fontSize": "medium" },                          "slot": "quote_3_text" },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" },     "slot": "attribution_3" }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

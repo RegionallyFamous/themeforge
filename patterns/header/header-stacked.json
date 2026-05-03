@@ -1,0 +1,57 @@
+{
+  "id": "header-stacked",
+  "name": "Header — Stacked",
+  "category": "header",
+  "description": "Site title with a tagline beneath it (left), navigation right. Useful when the brand name alone doesn't carry enough — small batch makers, niche specialty stores.",
+
+  "compatible_templates": ["parts/header"],
+  "compatible_moods": ["heritage", "apothecary", "botanical", "coastal", "playful", "sport"],
+
+  "slots": {
+    "tagline": { "type": "text", "max_chars": 60, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.background",
+    "color.foreground",
+    "color.muted",
+    "typography.body",
+    "spacing.30"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "header",
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/group",
+          "attrs": {
+            "align": "wide",
+            "style": { "spacing": { "padding": { "top": "var:preset|spacing|30", "bottom": "var:preset|spacing|30" } } },
+            "layout": { "type": "flex", "justifyContent": "space-between", "verticalAlignment": "center" }
+          },
+          "innerBlocks": [
+            {
+              "name": "core/group",
+              "attrs": { "layout": { "type": "constrained" } },
+              "innerBlocks": [
+                { "name": "core/site-title", "attrs": { "level": 0, "fontSize": "medium" } },
+                { "name": "core/paragraph", "attrs": { "fontSize": "small", "textColor": "muted" }, "slot": "tagline" }
+              ]
+            },
+            { "name": "core/navigation", "attrs": { "layout": { "type": "flex", "justifyContent": "right" }, "fontSize": "small" } }
+          ]
+        },
+        {
+          "name": "core/separator",
+          "attrs": { "opacity": "css", "className": "is-style-default" }
+        }
+      ]
+    }
+  ]
+}
