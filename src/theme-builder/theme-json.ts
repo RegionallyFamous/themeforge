@@ -127,6 +127,10 @@ export interface ThemeJson {
     };
     elements: Record<string, unknown>;
     blocks: Record<string, unknown>;
+    /** Raw CSS injected at theme-json level. Used for micro-interactions
+     *  and details that the structured fields can't express (hover
+     *  lifts, image zoom, focus rings, sale badge polish). */
+    css: string;
   };
   templateParts: Array<{ name: string; title: string; area: string }>;
 }
@@ -340,6 +344,7 @@ export function buildThemeJson(tokens: ThemeTokens): ThemeJson {
           spacing: { padding: { top: spaceBy("section"), bottom: spaceBy("section"), left: spaceBy("40"), right: spaceBy("40") } },
         },
       },
+      css: buildPremiumCss(tokens),
     },
     templateParts: [
       { name: "header", title: "Header", area: "header" },
@@ -437,6 +442,94 @@ function buildShadows(_tokens: ThemeTokens): ShadowEntry[] {
     { name: "Floating",slug: "floating",shadow: "0 12px 32px rgba(0,0,0,0.10), 0 32px 64px rgba(0,0,0,0.12)" },
     { name: "Inset",   slug: "inset",   shadow: "inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.10)" },
   ];
+}
+
+/**
+ * Premium polish CSS — the micro-interactions and details the
+ * structured theme.json fields can't express on their own. This is what
+ * separates "block theme that renders" from "block theme that feels
+ * like a sellable product":
+ *
+ *   - smooth transitions on every interactive element
+ *   - product cards lift on hover (Outerknown / Saturdays NYC pattern)
+ *   - product images zoom inside their container on hover
+ *   - sale badge styled as a deliberate small pill, not the WP default rectangle
+ *   - newsletter form fields styled with the brand palette
+ *   - hairline section dividers using the muted color
+ *   - eyebrow text styling for the small-caps tracked-out headings
+ *     used as section eyebrows
+ *   - refined separator styling (centered short hairline, not full-width thick)
+ *   - product card title gets just a touch of weight + tracking
+ *   - heading typography opens up letter-spacing on the largest sizes
+ */
+function buildPremiumCss(tokens: ThemeTokens): string {
+  const muted = tokens.palette.find((c) => c.slug === "muted")?.color ?? "currentColor";
+  const primary = tokens.palette.find((c) => c.slug === "primary")?.color ?? "#000";
+  const bg = tokens.palette.find((c) => c.slug === "background")?.color ?? "#fff";
+  const fg = tokens.palette.find((c) => c.slug === "foreground")?.color ?? "#000";
+
+  // Use string concatenation rather than a giant template literal so the
+  // intent of each rule stays close to its CSS.
+  return [
+    `/* Smooth transitions for everything interactive — what feels "designed". */`,
+    `a, button, .wp-block-button__link, .wp-block-image img, .wp-block-woocommerce-product-image img, .wp-block-cover, .wp-block-group { transition: transform .25s ease, opacity .25s ease, color .2s ease, background-color .2s ease, border-color .2s ease, box-shadow .25s ease; }`,
+    ``,
+    `/* Buttons: subtle lift on hover (the move every premium e-comm theme makes) */`,
+    `.wp-block-button__link:hover { transform: translateY(-1px); }`,
+    `.wp-block-button__link:active { transform: translateY(0); }`,
+    ``,
+    `/* Product cards in WC product collection — lift on hover, zoom image */`,
+    `.wp-block-woocommerce-product-template > li, .wp-block-woocommerce-product-template > .wc-block-product { display: flex; flex-direction: column; gap: .75rem; transition: transform .3s ease; }`,
+    `.wp-block-woocommerce-product-template > li:hover, .wp-block-woocommerce-product-template > .wc-block-product:hover { transform: translateY(-4px); }`,
+    `.wp-block-woocommerce-product-image { overflow: hidden; }`,
+    `.wp-block-woocommerce-product-image img { transition: transform .5s ease; }`,
+    `.wp-block-woocommerce-product-template > li:hover .wp-block-woocommerce-product-image img,`,
+    `.wp-block-woocommerce-product-template > .wc-block-product:hover .wp-block-woocommerce-product-image img { transform: scale(1.04); }`,
+    ``,
+    `/* Sale badge — refined small pill instead of WP's default rectangle */`,
+    `.wc-block-components-product-sale-badge { background: ${primary}; color: ${bg}; padding: .25rem .65rem; border-radius: 999px; font-size: .7rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; box-shadow: 0 1px 2px rgba(0,0,0,.08); }`,
+    ``,
+    `/* Product title in grid — slight tracking to make it feel composed */`,
+    `.wp-block-woocommerce-product-template a.wp-block-post-title__link, .wp-block-post-title a { letter-spacing: -.005em; text-decoration: none; }`,
+    ``,
+    `/* Newsletter forms — match brand tokens so they don't look like raw HTML */`,
+    `.forge-newsletter { display: flex; gap: .5rem; align-items: stretch; flex-wrap: wrap; }`,
+    `.forge-newsletter input[type="email"] { flex: 1 1 220px; padding: .85rem 1rem; border: 1px solid ${muted}; background: ${bg}; color: ${fg}; font: inherit; border-radius: 0; }`,
+    `.forge-newsletter input[type="email"]:focus { outline: 2px solid ${primary}; outline-offset: 1px; }`,
+    `.forge-newsletter button { padding: .85rem 1.5rem; background: ${primary}; color: ${bg}; border: none; font: inherit; font-weight: 500; letter-spacing: .02em; cursor: pointer; transition: transform .25s ease, opacity .2s ease; }`,
+    `.forge-newsletter button:hover { transform: translateY(-1px); opacity: .92; }`,
+    ``,
+    `/* Eyebrow microcopy — small caps tracked-out, used by section eyebrows */`,
+    `.has-text-color.has-muted-color.has-small-font-size, p.has-small-font-size.has-muted-color { letter-spacing: .12em; text-transform: uppercase; font-weight: 500; }`,
+    ``,
+    `/* Marquee strip — used by hero-marquee and usp-row-five */`,
+    `p.forge-marquee { letter-spacing: .08em; text-transform: uppercase; font-size: .8rem; font-weight: 500; }`,
+    ``,
+    `/* Separator: a short centered hairline reads as deliberate (vs WP's full-width default) */`,
+    `hr.wp-block-separator:not(.is-style-wide):not(.is-style-dots) { width: 60px; max-width: 60px; margin-left: auto; margin-right: auto; border: 0; border-top: 1px solid ${muted}; opacity: .6; }`,
+    ``,
+    `/* Image hover for editorial cards (about / category sections) */`,
+    `figure.wp-block-image { overflow: hidden; }`,
+    `figure.wp-block-image img { transition: transform .6s ease; }`,
+    `figure.wp-block-image:hover img { transform: scale(1.03); }`,
+    ``,
+    `/* Quote: italic citation block accent */`,
+    `.wp-block-quote cite { display: block; font-style: normal; font-size: .85rem; letter-spacing: .04em; text-transform: uppercase; opacity: .75; margin-top: .75rem; }`,
+    ``,
+    `/* Cover overlay: extra dim by default so type stays readable on light placeholders */`,
+    `.wp-block-cover .wp-block-cover__inner-container { width: 100%; }`,
+    ``,
+    `/* Site title link cleanup */`,
+    `.wp-block-site-title a { text-decoration: none; }`,
+    ``,
+    `/* Add to cart form — match button styling */`,
+    `.wp-block-woocommerce-add-to-cart-form button.single_add_to_cart_button { background: ${primary}; color: ${bg}; border: none; padding: .9rem 1.75rem; font: inherit; font-weight: 500; letter-spacing: .02em; transition: transform .25s ease, opacity .2s ease; cursor: pointer; }`,
+    `.wp-block-woocommerce-add-to-cart-form button.single_add_to_cart_button:hover { transform: translateY(-1px); opacity: .92; }`,
+    ``,
+    `/* Reduce motion respect */`,
+    `@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; transform: none !important; } }`,
+    ``,
+  ].join("\n");
 }
 
 function friendlyName(slug: string): string {

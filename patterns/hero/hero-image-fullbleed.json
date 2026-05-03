@@ -2,14 +2,15 @@
   "id": "hero-image-fullbleed",
   "name": "Hero — Full-Bleed Image",
   "category": "hero",
-  "description": "Full-bleed cover image with overlay copy and CTA. Image carries the room — when the brand can lean on photography, this is the heaviest hitter in the library. Tall (640px+) min-height, dim overlay so the type stays readable.",
+  "description": "Full-bleed cover image with overlay copy and CTA. Image carries the room — when the brand can lean on photography, this is the heaviest hitter in the library. 80vh min-height, dim overlay so the type stays readable. Includes an all-caps eyebrow line above the headline for editorial polish.",
 
   "compatible_templates": ["index", "front-page", "page"],
   "compatible_moods": ["coastal", "playful", "sport", "y2k", "heritage", "editorial", "lux-mono", "brutalist", "sci"],
 
   "slots": {
     "background_image": { "type": "image_role", "role": "hero_lifestyle_full", "aspect": "16:9" },
-    "headline":         { "type": "text", "max_chars": 80,  "tone": "hero" },
+    "eyebrow":          { "type": "text", "max_chars": 36,  "tone": "microcopy" },
+    "headline":         { "type": "text", "max_chars": 90,  "tone": "hero" },
     "subhead":          { "type": "text", "max_chars": 200, "tone": "supporting" },
     "cta_label":        { "type": "text", "max_chars": 24,  "tone": "cta" },
     "cta_url":          { "type": "url",  "default": "/shop" }
@@ -29,29 +30,42 @@
       "attrs": {
         "align": "full",
         "dimRatio": 50,
-        "minHeight": 640,
-        "minHeightUnit": "px",
-        "contentPosition": "center center",
-        "focalPoint": { "x": 0.5, "y": 0.5 }
+        "minHeight": 80,
+        "minHeightUnit": "vh",
+        "contentPosition": "bottom left",
+        "focalPoint": { "x": 0.5, "y": 0.5 },
+        "isDark": true
       },
       "slot": "background_image",
       "innerBlocks": [
         {
           "name": "core/group",
           "attrs": {
-            "style": { "spacing": { "padding": { "left": "var:preset|spacing|40", "right": "var:preset|spacing|40" } } },
-            "layout": { "type": "constrained", "contentSize": "720px", "justifyContent": "center" }
+            "style": { "spacing": { "padding": { "left": "var:preset|spacing|40", "right": "var:preset|spacing|40", "bottom": "var:preset|spacing|40" } } },
+            "layout": { "type": "constrained", "contentSize": "880px" }
           },
           "innerBlocks": [
-            { "name": "core/heading",   "attrs": { "level": 1, "textAlign": "center", "fontSize": "huge", "textColor": "background" }, "slot": "headline" },
-            { "name": "core/paragraph", "attrs": { "align": "center", "fontSize": "large", "textColor": "background" },               "slot": "subhead" },
+            {
+              "name": "core/paragraph",
+              "attrs": { "fontSize": "small", "textColor": "background" },
+              "slot": "eyebrow"
+            },
+            {
+              "name": "core/heading",
+              "attrs": { "level": 1, "fontSize": "huge", "textColor": "background", "style": { "typography": { "lineHeight": "0.95", "letterSpacing": "-0.025em" } } },
+              "slot": "headline"
+            },
+            {
+              "name": "core/paragraph",
+              "attrs": { "fontSize": "large", "textColor": "background" },
+              "slot": "subhead"
+            },
             {
               "name": "core/buttons",
-              "attrs": { "layout": { "type": "flex", "justifyContent": "center" } },
               "innerBlocks": [
                 {
                   "name": "core/button",
-                  "attrs": { "backgroundColor": "primary", "textColor": "background" },
+                  "attrs": { "backgroundColor": "background", "textColor": "foreground" },
                   "slot": { "text": "cta_label", "url": "cta_url" }
                 }
               ]

@@ -78,6 +78,8 @@ export function buildPlaceholderSvg(
   const idx = roleHash(role); // deterministic palette pick per role
 
   switch (style) {
+    case "atmosphere":
+      return renderAtmosphere(baseW, baseH, palette);
     case "block":
       return renderBlock(baseW, baseH, palette, idx, role);
     case "logo":
@@ -88,10 +90,67 @@ export function buildPlaceholderSvg(
   }
 }
 
-type PlaceholderStyle = "gradient" | "block" | "logo";
+/**
+ * Atmospheric placeholder for hero / lifestyle slots. Builds a layered
+ * scene that reads as photography:
+ *   - vertical 3-stop gradient (sky → middle ground → foreground)
+ *   - soft sun / glow disc near top-right
+ *   - layered wave silhouettes near the bottom
+ * The result has visual depth and a focal point — much closer to "this
+ * is a photograph that hasn't been swapped in yet" than to "this is a
+ * gradient swatch with a wireframe box around it".
+ */
+function renderAtmosphere(baseW: number, baseH: number, palette: PlaceholderPalette): string {
+  // Three-stop vertical gradient: bg-alt (lightest) → primary → foreground
+  // (or a soft variant of fg). Approximates sky → distant water → near
+  // foreground with brand colors.
+  const sky    = palette.backgroundAlt;
+  const middle = palette.primary;
+  const ground = palette.foreground;
+
+  // Sun / glow position
+  const sunX = baseW * 0.78;
+  const sunY = baseH * 0.28;
+  const sunR = Math.min(baseW, baseH) * 0.18;
+
+  // Two layered wave silhouettes near the bottom for depth
+  const wave1Y = baseH * 0.78;
+  const wave2Y = baseH * 0.85;
+
+  return [
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${baseW} ${baseH}" width="${baseW}" height="${baseH}" preserveAspectRatio="xMidYMid slice">`,
+    `  <defs>`,
+    `    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">`,
+    `      <stop offset="0" stop-color="${sky}"/>`,
+    `      <stop offset="0.55" stop-color="${middle}"/>`,
+    `      <stop offset="1" stop-color="${ground}"/>`,
+    `    </linearGradient>`,
+    `    <radialGradient id="sun" cx="0.5" cy="0.5" r="0.5">`,
+    `      <stop offset="0" stop-color="${palette.background}" stop-opacity="0.45"/>`,
+    `      <stop offset="1" stop-color="${palette.background}" stop-opacity="0"/>`,
+    `    </radialGradient>`,
+    `  </defs>`,
+    `  <rect width="${baseW}" height="${baseH}" fill="url(#sky)"/>`,
+    // Soft sun glow
+    `  <circle cx="${sunX}" cy="${sunY}" r="${sunR * 2.2}" fill="url(#sun)"/>`,
+    `  <circle cx="${sunX}" cy="${sunY}" r="${sunR * 0.6}" fill="${palette.background}" opacity="0.35"/>`,
+    // Wave 1: mid-distance
+    `  <path d="M0,${wave1Y} C${baseW * 0.25},${wave1Y - baseH * 0.05} ${baseW * 0.55},${wave1Y + baseH * 0.06} ${baseW},${wave1Y - baseH * 0.02} L${baseW},${baseH} L0,${baseH} Z" fill="${ground}" opacity="0.35"/>`,
+    // Wave 2: foreground
+    `  <path d="M0,${wave2Y} C${baseW * 0.35},${wave2Y - baseH * 0.03} ${baseW * 0.65},${wave2Y + baseH * 0.04} ${baseW},${wave2Y - baseH * 0.01} L${baseW},${baseH} L0,${baseH} Z" fill="${ground}" opacity="0.55"/>`,
+    `</svg>`,
+    "",
+  ].join("\n");
+}
+
+type PlaceholderStyle = "gradient" | "block" | "logo" | "atmosphere";
 
 function pickStyle(role: string): PlaceholderStyle {
   const r = role.toLowerCase();
+  // Hero / lifestyle / centerpiece roles get the atmospheric style —
+  // suggests photography (horizon line, sun, soft layered shapes) rather
+  // than a flat gradient swatch.
+  if (/(hero|lifestyle|centerpiece|cover|story|feature_hero)/.test(r)) return "atmosphere";
   if (/(category|tile|feature|card)/.test(r)) return "block";
   if (/(logo|payment|press|brand)/.test(r)) return "logo";
   return "gradient";
