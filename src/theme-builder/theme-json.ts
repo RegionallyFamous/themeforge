@@ -2,15 +2,28 @@
  * Deterministic theme.json builder.
  *
  * Takes a typed `ThemeTokens` (the LLM-produced or hand-authored token
- * set) and emits a WordPress theme.json document. No I/O, no network,
- * no LLM. Phase 4's theme-json-generator produces the `ThemeTokens`
- * input; this file is what turns those tokens into the file WP reads.
+ * set) and emits a WordPress theme.json document targeting the WP 6.7
+ * schema. No I/O, no network, no LLM. Everything the LLM produces is a
+ * compact set of brand tokens; this file expands those into the full
+ * shape WordPress block themes need:
+ *
+ *   - settings: palette, gradients (derived from palette), shadow
+ *     presets, aspect ratios, fluid type ramp, spacing scale, root
+ *     padding awareness
+ *   - styles: per-element (h1–h6, button + hover + focus, link + hover,
+ *     heading shared, caption) + per-block (post-title, site-title,
+ *     quote, separator, buttons, navigation, WC product-price) defaults
+ *   - styles.spacing.padding root padding tokens
+ *
+ * The result mirrors what bundled WP themes (Twenty Twenty-Five etc.)
+ * emit. A theme without these touches looks like a wireframe; a theme
+ * with them looks like a finished product.
  */
 
 import type { ThemeTokens } from "../pipeline/types.js";
 import { fontFaceForFamily } from "./bunny-fonts.js";
 
-const SCHEMA_URL = "https://schemas.wp.org/trunk/theme.json";
+const SCHEMA_URL = "https://schemas.wp.org/wp/6.7/theme.json";
 
 export interface FontFaceEntry {
   fontFamily: string;
@@ -45,21 +58,43 @@ export interface PaletteEntry {
   color: string;
 }
 
+export interface GradientEntry {
+  name: string;
+  slug: string;
+  gradient: string;
+}
+
+export interface ShadowEntry {
+  name: string;
+  slug: string;
+  shadow: string;
+}
+
+export interface AspectRatioEntry {
+  name: string;
+  slug: string;
+  ratio: string;
+}
+
 export interface ThemeJson {
   $schema: string;
   version: 3;
   settings: {
     appearanceTools: true;
+    useRootPaddingAwareAlignments: true;
     layout: { contentSize: string; wideSize: string };
     color: {
       palette: PaletteEntry[];
+      gradients: GradientEntry[];
       custom: false;
       defaultPalette: false;
       defaultGradients: false;
+      defaultDuotone: false;
     };
     typography: {
       fontFamilies: FontFamilyEntry[];
       fontSizes: FontSizeEntry[];
+      defaultFontSizes: false;
       fluid: true;
       lineHeight: true;
       letterSpacing: true;
@@ -67,14 +102,31 @@ export interface ThemeJson {
     spacing: {
       spacingScale: { operator: "*"; increment: number; steps: number; mediumStep: number; unit: "rem" };
       spacingSizes: SpacingSizeEntry[];
+      defaultSpacingSizes: false;
       units: string[];
+      padding: true;
+      margin: true;
+      blockGap: true;
     };
     border: { color: true; radius: true; style: true; width: true };
+    shadow: {
+      defaultPresets: false;
+      presets: ShadowEntry[];
+    };
+    dimensions: {
+      aspectRatios: AspectRatioEntry[];
+      defaultAspectRatios: false;
+    };
   };
   styles: {
     color: { background: string; text: string };
     typography: { fontFamily: string; fontSize: string; lineHeight: string };
-    spacing: { blockGap: string };
+    spacing: {
+      blockGap: string;
+      padding: { left: string; right: string };
+    };
+    elements: Record<string, unknown>;
+    blocks: Record<string, unknown>;
   };
   templateParts: Array<{ name: string; title: string; area: string }>;
 }
@@ -92,27 +144,41 @@ const DENSITY: Record<
 };
 
 export function buildThemeJson(tokens: ThemeTokens): ThemeJson {
+  const fontSizes = buildFontSizes(tokens);
+  const sizeBy = (slug: FontSizeSlug) => `var:preset|font-size|${slug}`;
+  const colorBy = (slug: string) => `var:preset|color|${slug}`;
+  const spaceBy = (slug: string) => `var:preset|spacing|${slug}`;
+
+  const headingFamily = `var:preset|font-family|heading`;
+  const bodyFamily = `var:preset|font-family|body`;
+  const headingWeight = tokens.typography.heading.fontWeight;
+  const headingLineHeight = tokens.typography.heading.lineHeight;
+
   return {
     $schema: SCHEMA_URL,
     version: 3,
     settings: {
       appearanceTools: true,
+      useRootPaddingAwareAlignments: true,
       layout: {
         contentSize: tokens.spacing.contentMaxWidth,
         wideSize: tokens.spacing.wideMaxWidth,
       },
       color: {
         palette: tokens.palette.map((c) => ({ name: c.name, slug: c.slug, color: c.color })),
+        gradients: buildGradients(tokens),
         custom: false,
         defaultPalette: false,
         defaultGradients: false,
+        defaultDuotone: false,
       },
       typography: {
         fontFamilies: [
           buildFontFamily(tokens.typography.heading.fontFamily, "heading"),
           buildFontFamily(tokens.typography.body.fontFamily, "body"),
         ],
-        fontSizes: buildFontSizes(tokens),
+        fontSizes,
+        defaultFontSizes: false,
         fluid: true,
         lineHeight: true,
         letterSpacing: true,
@@ -126,21 +192,154 @@ export function buildThemeJson(tokens: ThemeTokens): ThemeJson {
           { name: "Roomy",   slug: "50",      size: "3.25rem" },
           { name: "Section", slug: "section", size: tokens.spacing.sectionY },
         ],
+        defaultSpacingSizes: false,
         units: ["px", "em", "rem", "%", "vh", "vw"],
+        padding: true,
+        margin: true,
+        blockGap: true,
       },
       border: { color: true, radius: true, style: true, width: true },
+      shadow: {
+        defaultPresets: false,
+        presets: buildShadows(tokens),
+      },
+      dimensions: {
+        aspectRatios: [
+          { name: "Square",     slug: "square",     ratio: "1" },
+          { name: "Portrait",   slug: "portrait",   ratio: "3/4" },
+          { name: "Tall",       slug: "tall",       ratio: "4/5" },
+          { name: "Vertical",   slug: "vertical",   ratio: "9/16" },
+          { name: "Landscape",  slug: "landscape",  ratio: "4/3" },
+          { name: "Wide",       slug: "wide",       ratio: "16/9" },
+          { name: "Cinematic",  slug: "cinematic",  ratio: "21/9" },
+        ],
+        defaultAspectRatios: false,
+      },
     },
     styles: {
       color: {
-        background: `var(--wp--preset--color--${slugOrDefault(tokens.palette, "background")})`,
-        text:       `var(--wp--preset--color--${slugOrDefault(tokens.palette, "foreground")})`,
+        background: colorBy(slugOrDefault(tokens.palette, "background")),
+        text:       colorBy(slugOrDefault(tokens.palette, "foreground")),
       },
       typography: {
-        fontFamily: "var(--wp--preset--font-family--body)",
-        fontSize:   "var(--wp--preset--font-size--medium)",
+        fontFamily: bodyFamily,
+        fontSize:   sizeBy("medium"),
         lineHeight: tokens.typography.body.lineHeight,
       },
-      spacing: { blockGap: DENSITY[tokens.density].blockGap },
+      spacing: {
+        blockGap: DENSITY[tokens.density].blockGap,
+        // Root padding — every alignfull/wide section breathes consistently
+        // at the page edges. Pairs with useRootPaddingAwareAlignments.
+        padding: { left: spaceBy("40"), right: spaceBy("40") },
+      },
+      elements: {
+        // Per-heading sizing pulled from the fluid scale. Each level
+        // gets a distinct presence — h1 huge, h2 x-large, h3 large,
+        // h4–h6 progressively tighter. Without this, every heading just
+        // uses the WP default and the type system reads as undifferentiated.
+        h1: { typography: { fontFamily: headingFamily, fontSize: sizeBy("huge"),    fontWeight: headingWeight, lineHeight: headingLineHeight, letterSpacing: "-0.02em" } },
+        h2: { typography: { fontFamily: headingFamily, fontSize: sizeBy("x-large"), fontWeight: headingWeight, lineHeight: "1.1",            letterSpacing: "-0.015em" } },
+        h3: { typography: { fontFamily: headingFamily, fontSize: sizeBy("large"),   fontWeight: headingWeight, lineHeight: "1.2" } },
+        h4: { typography: { fontFamily: headingFamily, fontSize: sizeBy("medium"),  fontWeight: headingWeight, lineHeight: "1.3" } },
+        h5: { typography: { fontFamily: headingFamily, fontSize: sizeBy("small"),   fontWeight: headingWeight, lineHeight: "1.4" } },
+        h6: { typography: { fontFamily: headingFamily, fontSize: sizeBy("small"),   fontWeight: headingWeight, lineHeight: "1.4" } },
+        heading: { typography: { fontFamily: headingFamily, fontWeight: headingWeight, lineHeight: headingLineHeight } },
+        button: {
+          color: { background: colorBy("primary"), text: colorBy(slugOrDefault(tokens.palette, "background")) },
+          spacing: { padding: { top: "0.85rem", right: "1.75rem", bottom: "0.85rem", left: "1.75rem" } },
+          typography: { fontSize: sizeBy("small"), fontWeight: "500", letterSpacing: "0.02em" },
+          border: { radius: tokens.radius.md },
+          ":hover": {
+            color: {
+              background: `color-mix(in srgb, var(--wp--preset--color--primary) 88%, transparent)`,
+              text: colorBy(slugOrDefault(tokens.palette, "background")),
+            },
+          },
+          ":focus": {
+            outline: { color: colorBy("primary"), offset: "2px", style: "solid", width: "2px" },
+          },
+        },
+        link: {
+          color: { text: "currentColor" },
+          typography: { textDecoration: "underline" },
+          ":hover": { typography: { textDecoration: "none" } },
+        },
+        caption: { typography: { fontSize: sizeBy("small") } },
+      },
+      blocks: {
+        // Site title leans into the brand's heading family at small
+        // sizes (header chrome). Strip the link underline; let
+        // navigation sit cleanly next to it.
+        "core/site-title": {
+          typography: { fontFamily: headingFamily, fontWeight: headingWeight, letterSpacing: "-0.01em" },
+          elements: {
+            link: {
+              typography: { textDecoration: "none" },
+              ":hover": { typography: { textDecoration: "underline" } },
+            },
+          },
+        },
+        // Product titles in the grid. Small + clean by default; bold
+        // links so they read as catalog entries.
+        "core/post-title": {
+          typography: { fontFamily: headingFamily, fontWeight: headingWeight },
+          elements: {
+            link: {
+              typography: { textDecoration: "none" },
+              ":hover": { typography: { textDecoration: "underline" } },
+            },
+          },
+        },
+        // Pull quotes get a left border accent in primary, generous
+        // padding, and a lighter weight so they don't compete with body.
+        "core/quote": {
+          border: { style: "solid", width: "0 0 0 3px", color: colorBy("primary") },
+          spacing: {
+            blockGap: spaceBy("30"),
+            margin:  { left: "0", right: "0" },
+            padding: { top: spaceBy("30"), right: spaceBy("40"), bottom: spaceBy("30"), left: spaceBy("40") },
+          },
+          typography: { fontSize: sizeBy("large"), fontStyle: "italic", fontWeight: "400" },
+        },
+        // Separator: subtle hairline using muted color so it reads as a
+        // structural divider, not a heavy line.
+        "core/separator": {
+          border: { color: colorBy("muted"), style: "solid", width: "0 0 1px 0" },
+        },
+        "core/buttons": {
+          spacing: { blockGap: "12px" },
+        },
+        "core/navigation": {
+          typography: { fontSize: sizeBy("small"), fontWeight: "500" },
+          elements: {
+            link: {
+              color: { text: "currentColor" },
+              typography: { textDecoration: "none" },
+              ":hover": { typography: { textDecoration: "underline" } },
+            },
+          },
+        },
+        // WC product price — the hero copy of any product card. Keep it
+        // emphasised but not shouty.
+        "woocommerce/product-price": {
+          typography: { fontFamily: headingFamily, fontSize: sizeBy("medium"), fontWeight: "500" },
+        },
+        "woocommerce/product-rating": {
+          typography: { fontSize: sizeBy("small") },
+        },
+        // Newsletter / signup forms via core/html — give them
+        // baseline button-like spacing so the inline forms don't look
+        // like raw HTML.
+        "core/html": {
+          spacing: { blockGap: "8px" },
+        },
+        // Cover blocks (full-bleed heroes) — give the inner container
+        // a comfortable max-width so headlines don't stretch to edges
+        // on ultra-wide screens.
+        "core/cover": {
+          spacing: { padding: { top: spaceBy("section"), bottom: spaceBy("section"), left: spaceBy("40"), right: spaceBy("40") } },
+        },
+      },
     },
     templateParts: [
       { name: "header", title: "Header", area: "header" },
@@ -201,6 +400,43 @@ function buildFontSizes(tokens: ThemeTokens): FontSizeEntry[] {
     });
   });
   return out;
+}
+
+/**
+ * Derive a small set of palette gradients. Used by the cover/group
+ * blocks for visual variety beyond flat colors. Operators can pick one
+ * in the editor for any block that supports gradient backgrounds.
+ */
+function buildGradients(tokens: ThemeTokens): GradientEntry[] {
+  const get = (slug: string, fallback: string): string =>
+    tokens.palette.find((c) => c.slug === slug)?.color ?? fallback;
+  const primary = get("primary", "#1F1F1F");
+  const accent = get("accent", get("foreground", "#000000"));
+  const fg = get("foreground", "#1A1A1A");
+  const bg = get("background", "#FFFFFF");
+  const bgAlt = get("background-alt", bg);
+
+  return [
+    { name: "Primary diagonal",       slug: "primary-diagonal",       gradient: `linear-gradient(135deg, ${primary} 0%, ${accent} 100%)` },
+    { name: "Sunset",                 slug: "sunset",                 gradient: `linear-gradient(180deg, ${primary} 0%, ${bgAlt} 100%)` },
+    { name: "Soft surface",           slug: "soft-surface",           gradient: `linear-gradient(180deg, ${bg} 0%, ${bgAlt} 100%)` },
+    { name: "Deep contrast",          slug: "deep-contrast",          gradient: `linear-gradient(135deg, ${fg} 0%, ${primary} 100%)` },
+    { name: "Primary spotlight",      slug: "primary-spotlight",      gradient: `radial-gradient(circle at 30% 30%, ${primary} 0%, ${fg} 80%)` },
+  ];
+}
+
+/**
+ * A small shadow ramp tuned in neutrals. Buttons/cards/cover overlays
+ * pick from these in the editor; without presets the editor's own
+ * defaults are too "Material" for editorial brands.
+ */
+function buildShadows(_tokens: ThemeTokens): ShadowEntry[] {
+  return [
+    { name: "Subtle",  slug: "subtle",  shadow: "0 1px 2px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.04)" },
+    { name: "Lifted",  slug: "lifted",  shadow: "0 4px 12px rgba(0,0,0,0.06), 0 12px 32px rgba(0,0,0,0.08)" },
+    { name: "Floating",slug: "floating",shadow: "0 12px 32px rgba(0,0,0,0.10), 0 32px 64px rgba(0,0,0,0.12)" },
+    { name: "Inset",   slug: "inset",   shadow: "inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.10)" },
+  ];
 }
 
 function friendlyName(slug: string): string {
