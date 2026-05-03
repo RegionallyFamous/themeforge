@@ -126,17 +126,24 @@ export async function runPipeline(spec: BrandSpec, deps: PipelineDeps): Promise<
     })),
   };
 
+  // Concurrency cap on the customizer fan-out. Sonnet's default org
+  // rate limit is 30k input tokens/min; each customizer call sends the
+  // brand spec + a pattern definition (~2k tokens), and the planner
+  // alone consumes ~6k. Serial keeps us under that ceiling without
+  // relying on retries. Higher tiers can bump this for shorter wall
+  // time. The Anthropic SDK auto-retries 429s with backoff, so even at
+  // limit=2 things eventually finish — just slower.
+  const CUSTOMIZER_CONCURRENCY = 1;
+
   const [customizedList, marketing] = await Promise.all([
-    Promise.all(
-      jobs.map(async (job) => {
-        const entry = library.get(job.pattern_id);
-        if (!entry) {
-          throw new Error(`pipeline: planner picked unknown pattern "${job.pattern_id}"`);
-        }
-        const customized = await customizePattern(enrichedSpec, entry.pattern, job.context, llm);
-        return { key: job.key, customized };
-      }),
-    ),
+    runWithConcurrency(jobs, CUSTOMIZER_CONCURRENCY, async (job) => {
+      const entry = library.get(job.pattern_id);
+      if (!entry) {
+        throw new Error(`pipeline: planner picked unknown pattern "${job.pattern_id}"`);
+      }
+      const customized = await customizePattern(enrichedSpec, entry.pattern, job.context, llm);
+      return { key: job.key, customized };
+    }),
     generateMarketing(marketingDeps, llm),
   ]);
   const customized = new Map<string, CustomizedPattern>(
@@ -187,6 +194,30 @@ export async function runPipeline(spec: BrandSpec, deps: PipelineDeps): Promise<
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────
+
+/**
+ * Run `fn` over `items` with at most `limit` concurrent in-flight calls.
+ * Preserves input order in the result. Used by the customizer fan-out
+ * to stay under the per-minute token rate limit on the LLM provider.
+ */
+async function runWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let cursor = 0;
+  const workerCount = Math.max(1, Math.min(limit, items.length));
+  const workers = Array.from({ length: workerCount }, async () => {
+    while (true) {
+      const i = cursor++;
+      if (i >= items.length) return;
+      results[i] = await fn(items[i]!);
+    }
+  });
+  await Promise.all(workers);
+  return results;
+}
 
 function templatePartRef(slug: string, tagName: string): BlockNode {
   return { name: "core/template-part", attrs: { slug, tagName } };

@@ -74,7 +74,11 @@ export class SchemaValidationError extends Error {
 // ── Factory ─────────────────────────────────────────────────────────────
 
 export function createLLM(config: LLMConfig = {}): LLM {
-  const client = config.client ?? new Anthropic();
+  // Bump SDK-level retries from the default 2 to 5 so transient 429s
+  // from rate-limit windows resolve themselves rather than failing the
+  // whole pipeline. The SDK uses exponential backoff with jitter and
+  // honors the `retry-after` header when present.
+  const client = config.client ?? new Anthropic({ maxRetries: 5 });
   const model = config.model ?? DEFAULT_MODEL;
   const maxRetries = config.maxRetries ?? DEFAULT_MAX_RETRIES;
   const runId = config.runId ?? new Date().toISOString().replace(/[:.]/g, "-");
@@ -90,7 +94,12 @@ export function createLLM(config: LLMConfig = {}): LLM {
         opts.toolDescription ??
         `Emit the structured output for the ${opts.stage} stage.`;
 
-      const inputSchema = zodToJsonSchema(opts.schema, { target: "openApi3" });
+      // Anthropic's tool input_schema validator requires JSON Schema
+      // (draft 2020-12). The `openApi3` target produces OpenAPI-flavored
+      // output (`nullable: true`, etc.) which the API rejects. The
+      // default jsonSchema7 target is forward-compatible with 2020-12
+      // for the primitives we use (object/array/string/number/enum).
+      const inputSchema = zodToJsonSchema(opts.schema, { target: "jsonSchema7" });
       const tool: Tool = {
         name: toolName,
         description: toolDescription,

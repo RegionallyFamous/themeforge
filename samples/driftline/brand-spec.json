@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "store": {
+    "name": "Driftline",
+    "tagline": "Surf and skate apparel for everyday cruising.",
+    "description": "Driftline is a small San Diego apparel brand making surf- and skate-inspired tees, hoodies, and boardshorts. Every piece is screen-printed locally in small runs, designed by riders for riders.",
+    "niche": "surf and skate apparel"
+  },
+  "voice": {
+    "formality": 2,
+    "playfulness": 4,
+    "premiumness": 3
+  },
+  "audience": {
+    "description": "Surfers, skaters, and beach-town day-trippers who want technical apparel that doesn't look uniformly branded. 18-35, salt-and-concrete crowd."
+  },
+  "mood": {
+    "primary": "coastal",
+    "secondary": "playful"
+  },
+  "color": {
+    "source": "palette_card",
+    "palette": ["#1F3A47", "#7AB6C5", "#E2D9C2", "#F6EFDF", "#11212A"],
+    "base": "light"
+  },
+  "typography": {
+    "pairing": "humanist",
+    "headline_font": "Söhne",
+    "body_font": "Inter"
+  },
+  "density": "balanced",
+  "references": [
+    { "url": "https://outerknown.com", "notes": "Photography-led product cards, ocean palette, easy reading rhythm." },
+    { "url": "https://saturdaysnyc.com",  "notes": "Editorial product detail pages, lots of whitespace." }
+  ],
+  "locale": "en_US"
+}

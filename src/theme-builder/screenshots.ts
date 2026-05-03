@@ -79,13 +79,28 @@ export async function captureScreenshots(opts: CaptureOptions): Promise<Screensh
   const written: string[] = [];
 
   try {
+    // For `single-product` shots we need a real product permalink, not
+    // the generic `?post_type=product` query which falls through to the
+    // page template. Probe the shop page once and cache the first
+    // product link for the whole batch.
+    let firstProductUrl: string | null = null;
+    const needsProduct = opts.brief.some((s) => s.page === "single-product");
+    if (needsProduct) {
+      firstProductUrl = await probeFirstProductUrl(browser, opts.url, timeout);
+    }
+
     for (const shot of opts.brief) {
       const context = await browser.newContext({
         viewport: { width: shot.width, height: heightFor(shot.width) },
         deviceScaleFactor: 2,
       });
       const page = await context.newPage();
-      const target = `${stripTrailingSlash(opts.url)}${pathForShotPage(shot.page)}`;
+      let target: string;
+      if (shot.page === "single-product" && firstProductUrl) {
+        target = firstProductUrl;
+      } else {
+        target = `${stripTrailingSlash(opts.url)}${pathForShotPage(shot.page)}`;
+      }
 
       try {
         await page.goto(target, { waitUntil: "networkidle", timeout });
@@ -106,6 +121,43 @@ export async function captureScreenshots(opts: CaptureOptions): Promise<Screensh
   }
 
   return { written };
+}
+
+/**
+ * Visit `/shop/` and return the href of the first product link found.
+ * Used so single-product screenshots land on a real product page rather
+ * than the empty `?post_type=product` listing. Returns null when no
+ * products exist (caller falls back to the generic path).
+ */
+async function probeFirstProductUrl(
+  browser: import("playwright-core").Browser,
+  baseUrl: string,
+  timeout: number,
+): Promise<string | null> {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  const page = await ctx.newPage();
+  try {
+    await page.goto(`${stripTrailingSlash(baseUrl)}/shop/`, {
+      waitUntil: "domcontentloaded",
+      timeout,
+    });
+    // The callback runs inside the browser; TypeScript doesn't have DOM
+    // types in our compiler `lib`, so the `any` cast keeps tsc quiet
+    // without leaking DOM globals into the rest of our codebase.
+    const href = await page.evaluate(() => {
+      const d = (globalThis as unknown as { document: any }).document;
+      const link =
+        d.querySelector("a.woocommerce-LoopProduct-link") ??
+        d.querySelector(".wp-block-woocommerce-product-template a[href*='/product/']") ??
+        d.querySelector("a[href*='/product/']");
+      return (link as { href?: string } | null)?.href ?? null;
+    });
+    return href;
+  } catch {
+    return null;
+  } finally {
+    await ctx.close();
+  }
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────────

@@ -102,6 +102,12 @@ export function createStudioHost(options: StudioHostOptions = {}): DeployHost {
         if (wcInstall.status === 0) {
           notes.push(`WooCommerce installed/activated.`);
 
+          // WC enables a "Coming Soon" overlay by default on fresh
+          // installs which hides the storefront behind a launch
+          // splash. For preview/screenshot purposes we want the actual
+          // store visible — turn it off (idempotent).
+          await cli.wp(site.path, ["option", "update", "woocommerce_coming_soon", "no"]);
+
           if (loadSampleData) {
             const importNote = await maybeImportSampleData(cli, site.path);
             if (importNote) notes.push(importNote);
@@ -143,12 +149,15 @@ export function createStudioHost(options: StudioHostOptions = {}): DeployHost {
  * `null` when nothing actionable happened.
  */
 async function maybeImportSampleData(cli: StudioCli, sitePath: string): Promise<string | null> {
-  const sampleXml = join(
-    sitePath,
-    "wp-content/plugins/woocommerce/sample-data/sample_products.xml",
-  );
-  if (!existsSync(sampleXml) || !statSync(sampleXml).isFile()) {
-    return `WC sample data XML not found at ${sampleXml}; skipped.`;
+  // Studio sandboxes PHP with ABSPATH at `/wordpress`, not the host
+  // filesystem path. Existence check + the wp-cli `import` command both
+  // run inside that sandbox, so we work with a WP-relative path.
+  // Resolution from cwd=/wordpress produces /wordpress/wp-content/... —
+  // which is what PHP sees.
+  const sampleXmlRel = "wp-content/plugins/woocommerce/sample-data/sample_products.xml";
+  const sampleXmlHost = join(sitePath, sampleXmlRel);
+  if (!existsSync(sampleXmlHost) || !statSync(sampleXmlHost).isFile()) {
+    return `WC sample data XML not found at ${sampleXmlHost}; skipped.`;
   }
 
   // Count existing products. If any exist, we leave them alone — don't
@@ -170,7 +179,7 @@ async function maybeImportSampleData(cli: StudioCli, sitePath: string): Promise<
   }
 
   const importRes = await cli.wp(sitePath, [
-    "import", sampleXml, "--authors=skip",
+    "import", sampleXmlRel, "--authors=skip",
   ]);
   if (importRes.status !== 0) {
     return `WC sample import failed: ${importRes.stderr.trim().slice(0, 160) || "(no stderr)"}`;

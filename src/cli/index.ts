@@ -13,7 +13,10 @@ import { resolve as resolvePath } from "node:path";
 import { Command } from "commander";
 import chalk from "chalk";
 import ora from "ora";
-import "dotenv/config";
+// Load .env with override so a value in .env wins over an empty/stale
+// ANTHROPIC_API_KEY in the parent shell (Claude Desktop sets one to "").
+import { config as loadDotenv } from "dotenv";
+loadDotenv({ override: true });
 import { runForm } from "../brand-spec/form.js";
 import { inquirerPrompter } from "../brand-spec/prompter-inquirer.js";
 import {
