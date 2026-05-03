@@ -37,7 +37,7 @@ export const MarketingAssetsSchema = z
     description: z
       .string()
       .min(200)
-      .max(800)
+      .max(1200)
       .describe(
         "2–3 paragraphs. What the buyer gets, in their language. Not a feature list — that's a separate field.",
       ),
@@ -67,7 +67,7 @@ export const MarketingAssetsSchema = z
     demo_store_concept: z
       .string()
       .min(100)
-      .max(600)
+      .max(900)
       .describe(
         "One paragraph describing what a demo site for this theme would showcase. Specific products, sections, and copy hooks — enough that someone could build the demo from it.",
       ),

@@ -1,0 +1,40 @@
+{
+  "id": "announcement-bar",
+  "name": "Announcement — Bar",
+  "category": "announcement",
+  "description": "Single-line announcement strip — typically 'Free shipping over $X' or 'Last day for holiday delivery'. Sits above the header at the very top of the page. Tracked-out small caps for the editorial signal you see on premium DTC sites.",
+
+  "compatible_templates": ["index", "front-page", "page", "single-product", "archive-product"],
+  "compatible_moods": ["editorial", "heritage", "nordic", "lux-mono", "playful", "sport", "coastal", "apothecary", "botanical"],
+
+  "slots": {
+    "message": { "type": "text", "max_chars": 100, "tone": "microcopy" }
+  },
+
+  "theme_tokens": [
+    "color.foreground",
+    "color.background",
+    "typography.body"
+  ],
+
+  "tree": [
+    {
+      "name": "core/group",
+      "attrs": {
+        "align": "full",
+        "tagName": "section",
+        "backgroundColor": "foreground",
+        "textColor": "background",
+        "style": { "spacing": { "padding": { "top": "var:preset|spacing|20", "bottom": "var:preset|spacing|20" } } },
+        "layout": { "type": "constrained" }
+      },
+      "innerBlocks": [
+        {
+          "name": "core/paragraph",
+          "attrs": { "align": "center", "fontSize": "small", "textColor": "background" },
+          "slot": "message"
+        }
+      ]
+    }
+  ]
+}

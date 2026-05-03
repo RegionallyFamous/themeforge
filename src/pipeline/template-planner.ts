@@ -158,6 +158,15 @@ Picking guidelines:
 - editorial / heritage / lux-mono / apothecary / nordic / botanical: lean *restrained*. Prefer \`hero-split\`, \`hero-cover\`, \`hero-text-only\`, \`category-trio\`, \`testimonial-single\`. Avoid full-bleed-image and color-block heroes — they'd clash with the magazine rhythm.
 - sci: structural / grid-driven. \`hero-text-only\`, \`grid-4up\`, \`usp-row-five\`, \`faq-flat\`.
 
+**Premium polish — for any brand with premiumness >= 3, build pages with editorial RHYTHM CHANGE:**
+
+A flat stack of "hero → categories → products → testimonials → newsletter" reads as a template. Premium e-commerce alternates: announcement strip → header → bold hero → tight category section → editorial story-split → tight product grid → stats row → testimonial → newsletter → footer. Specifically:
+
+- Use \`announcement-bar\` at the very top of \`index\`/\`front-page\` for shipping or new-drop signals — premium DTC sites all have one.
+- Use \`story-split\` somewhere on \`index\` to break the centered-stack rhythm with an asymmetric image+text moment (this is the move every editorial brand makes — Outerknown, Saturdays NYC, Aesop).
+- Use \`stats-row\` when the brand has a believable scale story ("X orders shipped", "Y years roasting", "100% made local"). Drives social proof in a single typographic moment.
+- Don't repeat the same visual rhythm — alternate constrained-content patterns with full-bleed alignfull patterns so the eye gets a break.
+
 Hard constraints (the tool will reject violations):
 
 - Only use pattern IDs from the catalog.

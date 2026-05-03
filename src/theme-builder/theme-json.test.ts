@@ -55,15 +55,20 @@ describe("buildThemeJson", () => {
     expect(tj.settings.typography.fontFamilies[1]?.name).toBe("Inter");
   });
 
-  it("emits five named font sizes; first two are non-fluid, rest are clamp()", () => {
+  it("emits six named font sizes (small through huge plus a dramatic display); first two are non-fluid, rest are clamp()", () => {
     const tj = buildThemeJson(baseTokens);
     const sizes = tj.settings.typography.fontSizes;
-    expect(sizes.map((s) => s.slug)).toEqual(["small", "medium", "large", "x-large", "huge"]);
+    expect(sizes.map((s) => s.slug)).toEqual(["small", "medium", "large", "x-large", "huge", "display"]);
     expect(sizes[0]?.fluid).toBe(false);
     expect(sizes[1]?.fluid).toBe(false);
     expect(sizes[2]?.size).toMatch(/^clamp\(/);
     expect(sizes[3]?.size).toMatch(/^clamp\(/);
     expect(sizes[4]?.size).toMatch(/^clamp\(/);
+    // Display should be roughly 2× huge — used by h1 for dramatic page-hero scale
+    expect(sizes[5]?.size).toMatch(/^clamp\(/);
+    const huge = parseFloat(sizes[4]!.size.match(/(\d+\.?\d*)rem\)$/)?.[1] ?? "0");
+    const display = parseFloat(sizes[5]!.size.match(/(\d+\.?\d*)rem\)$/)?.[1] ?? "0");
+    expect(display).toBeGreaterThan(huge * 1.5);
   });
 
   it("uses the input contentMaxWidth/wideMaxWidth and sectionY", () => {
@@ -116,8 +121,8 @@ describe("buildThemeJson", () => {
       expect(els[tag]?.typography, `element ${tag} typography`).toBeDefined();
       expect(els[tag]?.typography?.fontFamily).toBe("var:preset|font-family|heading");
     }
-    // h1 leans on the huge size; h6 collapses to small
-    expect((els.h1!.typography! as { fontSize?: string }).fontSize).toBe("var:preset|font-size|huge");
+    // h1 leans on the dramatic display size; h6 collapses to small
+    expect((els.h1!.typography! as { fontSize?: string }).fontSize).toBe("var:preset|font-size|display");
     expect((els.h6!.typography! as { fontSize?: string }).fontSize).toBe("var:preset|font-size|small");
   });
 

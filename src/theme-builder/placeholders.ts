@@ -101,9 +101,8 @@ export function buildPlaceholderSvg(
  * gradient swatch with a wireframe box around it".
  */
 function renderAtmosphere(baseW: number, baseH: number, palette: PlaceholderPalette): string {
-  // Three-stop vertical gradient: bg-alt (lightest) → primary → foreground
-  // (or a soft variant of fg). Approximates sky → distant water → near
-  // foreground with brand colors.
+  // Three-stop vertical gradient: bg-alt (lightest) → primary → foreground.
+  // Approximates sky → distant water → near foreground with brand colors.
   const sky    = palette.backgroundAlt;
   const middle = palette.primary;
   const ground = palette.foreground;
@@ -129,6 +128,13 @@ function renderAtmosphere(baseW: number, baseH: number, palette: PlaceholderPale
     `      <stop offset="0" stop-color="${palette.background}" stop-opacity="0.45"/>`,
     `      <stop offset="1" stop-color="${palette.background}" stop-opacity="0"/>`,
     `    </radialGradient>`,
+    // Film-grain noise filter — adds visible texture so the placeholder
+    // reads as a duotoned photograph rather than a flat gradient.
+    `    <filter id="noise" x="0" y="0" width="100%" height="100%">`,
+    `      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/>`,
+    `      <feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.18 0"/>`,
+    `      <feComposite in2="SourceGraphic" operator="in"/>`,
+    `    </filter>`,
     `  </defs>`,
     `  <rect width="${baseW}" height="${baseH}" fill="url(#sky)"/>`,
     // Soft sun glow
@@ -138,6 +144,9 @@ function renderAtmosphere(baseW: number, baseH: number, palette: PlaceholderPale
     `  <path d="M0,${wave1Y} C${baseW * 0.25},${wave1Y - baseH * 0.05} ${baseW * 0.55},${wave1Y + baseH * 0.06} ${baseW},${wave1Y - baseH * 0.02} L${baseW},${baseH} L0,${baseH} Z" fill="${ground}" opacity="0.35"/>`,
     // Wave 2: foreground
     `  <path d="M0,${wave2Y} C${baseW * 0.35},${wave2Y - baseH * 0.03} ${baseW * 0.65},${wave2Y + baseH * 0.04} ${baseW},${wave2Y - baseH * 0.01} L${baseW},${baseH} L0,${baseH} Z" fill="${ground}" opacity="0.55"/>`,
+    // Grain overlay — the bit that turns this from "abstract gradient"
+    // into "duotoned photograph awaiting replacement".
+    `  <rect width="${baseW}" height="${baseH}" filter="url(#noise)"/>`,
     `</svg>`,
     "",
   ].join("\n");

@@ -136,7 +136,7 @@ export interface ThemeJson {
 }
 
 const FONT_SIZE_SLUGS = ["small", "medium", "large", "x-large", "huge"] as const;
-type FontSizeSlug = (typeof FONT_SIZE_SLUGS)[number];
+type FontSizeSlug = (typeof FONT_SIZE_SLUGS)[number] | "display";
 
 const DENSITY: Record<
   ThemeTokens["density"],
@@ -241,7 +241,7 @@ export function buildThemeJson(tokens: ThemeTokens): ThemeJson {
         // gets a distinct presence — h1 huge, h2 x-large, h3 large,
         // h4–h6 progressively tighter. Without this, every heading just
         // uses the WP default and the type system reads as undifferentiated.
-        h1: { typography: { fontFamily: headingFamily, fontSize: sizeBy("huge"),    fontWeight: headingWeight, lineHeight: headingLineHeight, letterSpacing: "-0.02em" } },
+        h1: { typography: { fontFamily: headingFamily, fontSize: sizeBy("display"), fontWeight: headingWeight, lineHeight: "0.95",            letterSpacing: "-0.03em" } },
         h2: { typography: { fontFamily: headingFamily, fontSize: sizeBy("x-large"), fontWeight: headingWeight, lineHeight: "1.1",            letterSpacing: "-0.015em" } },
         h3: { typography: { fontFamily: headingFamily, fontSize: sizeBy("large"),   fontWeight: headingWeight, lineHeight: "1.2" } },
         h4: { typography: { fontFamily: headingFamily, fontSize: sizeBy("medium"),  fontWeight: headingWeight, lineHeight: "1.3" } },
@@ -404,6 +404,19 @@ function buildFontSizes(tokens: ThemeTokens): FontSizeEntry[] {
       name,
     });
   });
+  // Display: dramatic hero-h1 size — roughly 2× the huge base. Editorial
+  // brands lean on this for the one or two pieces of type that should
+  // stop the page. Always fluid so it scales nicely down to mobile.
+  const huge = ramp[4] ?? 3.25;
+  const displayBase = Math.max(huge * 1.85, 5.5);
+  const displayMin = Math.max(huge * 1.05, 3);
+  const displayVw = (displayBase - displayMin) * (lift * 1.2);
+  const displayLinear = displayMin - 0.5;
+  out.push({
+    slug: "display",
+    name: "Display",
+    size: `clamp(${stripTrailingZero(displayMin)}rem, ${stripTrailingZero(displayLinear)}rem + ${stripTrailingZero(displayVw)}vw, ${stripTrailingZero(displayBase)}rem)`,
+  });
   return out;
 }
 
@@ -525,6 +538,27 @@ function buildPremiumCss(tokens: ThemeTokens): string {
     `/* Add to cart form — match button styling */`,
     `.wp-block-woocommerce-add-to-cart-form button.single_add_to_cart_button { background: ${primary}; color: ${bg}; border: none; padding: .9rem 1.75rem; font: inherit; font-weight: 500; letter-spacing: .02em; transition: transform .25s ease, opacity .2s ease; cursor: pointer; }`,
     `.wp-block-woocommerce-add-to-cart-form button.single_add_to_cart_button:hover { transform: translateY(-1px); opacity: .92; }`,
+    ``,
+    `/* Subtle paper-grain texture on background-alt sections — the editorial`,
+    `   "this feels printed" cue. SVG turbulence inlined as data URI. Very`,
+    `   low opacity so it's barely-perceptible. */`,
+    `.has-background-alt-background-color { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='5'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); background-blend-mode: multiply; background-size: 200px; }`,
+    ``,
+    `/* h1 in editorial heroes - pull tight tracking, dramatic line-height. */`,
+    `h1, .wp-block-post-title { line-height: 0.95; }`,
+    ``,
+    `/* Cover blocks: ensure enough vertical room on tall heroes (the 80vh`,
+    `   setting in patterns + extra padding from inner-container) */`,
+    `.wp-block-cover.is-style-editorial-hero { min-height: 90vh; }`,
+    ``,
+    `/* Section dividers - when a group has class .is-style-divided, add`,
+    `   a subtle hairline at the top. Used by patterns that want to`,
+    `   announce a break. */`,
+    `.wp-block-group.is-style-divided { border-top: 1px solid ${muted}; opacity: 1; }`,
+    ``,
+    `/* Stats numbers - when a heading has class .has-stat-number-style,`,
+    `   render in display weight + super-tight tracking */`,
+    `.has-stat-number-style { font-weight: 600 !important; letter-spacing: -0.04em !important; line-height: 1 !important; font-feature-settings: "tnum" 1, "lnum" 1; }`,
     ``,
     `/* Reduce motion respect */`,
     `@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; transform: none !important; } }`,
