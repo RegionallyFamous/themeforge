@@ -1,56 +1,145 @@
 /**
- * Headless screenshot pipeline — scaffold only.
+ * Headless screenshot capture.
  *
- * Capturing real screenshots of a built theme requires running it inside
- * WordPress. The two viable hosts (per the roadmap):
+ * Drives a Chromium instance via `playwright-core` and grabs one
+ * full-page PNG per entry in the marketing screenshots brief. Uses the
+ * system Chrome via `executablePath` so the install is small (~5MB —
+ * no bundled browser). Tested end-to-end against WordPress Studio: the
+ * `studio` deploy adapter returns the `http://localhost:NNNN` URL this
+ * module consumes.
  *
- *   1. WordPress Playground — runs WP in the browser via WASM. No server
- *      install needed. Headless via Playwright + the Playground URL
- *      schema. Fastest setup, best for CI.
- *   2. Local WP install — for any case Playground doesn't cover (heavy
- *      WC blocks, custom plugins). Slower; needs MySQL.
- *
- * Neither is implementable as a pure-Node module — both need a browser
- * runtime and a running WordPress. This module exists to document the
- * intended interface and to surface a clear error if someone tries to
- * use it without the supporting infrastructure in place.
- *
- * The `marketing/screenshots-brief.md` file produced by the bundler is
- * the authoritative manual checklist until this is wired up. Each entry
- * names the page, viewport width, and what should be on screen.
+ * Fails cleanly when Chrome isn't available — surfaces a setup-required
+ * message rather than a confusing Playwright trace.
  */
 
+import { existsSync, mkdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import type { MarketingAssets } from "../pipeline/marketing.js";
 
-export interface ScreenshotJob {
-  /** Source file path of the built theme `.zip`. */
-  themeZip: string;
-  /** Where to write `<page>-<width>.png` files. */
+export interface CaptureOptions {
+  /** Base URL of the running site (e.g. `http://localhost:8881`). */
+  url: string;
+  /** Directory to write PNGs into. Created if missing. */
   outputDir: string;
-  /** Brief describing what shots to take (from the marketing stage). */
+  /** Brief from the bundled marketing assets. */
   brief: MarketingAssets["screenshots_brief"];
+  /** Override the Chrome executable. Defaults to common Mac path / env. */
+  chromePath?: string;
+  /** Per-shot navigation timeout in ms. Default 15000. */
+  timeoutMs?: number;
 }
 
 export interface ScreenshotResult {
-  written: string[]; // absolute paths to the captured PNG files
+  written: string[];
 }
 
-/**
- * Capture every screenshot in `brief`. Throws until a host is wired up
- * (Phase 8 ships the contract; the actual implementation lands when the
- * Playground integration is built out).
- */
-export async function captureScreenshots(_job: ScreenshotJob): Promise<ScreenshotResult> {
-  throw new Error(
-    [
-      "captureScreenshots: no screenshot host is wired up.",
-      "",
-      "To enable this in your environment, install one of:",
-      "  - WordPress Playground (browser WASM) — fastest path; uses Playwright.",
-      "  - A local WordPress + WooCommerce install — slower, needs MySQL.",
-      "",
-      "Until then, follow `<theme>/marketing/screenshots-brief.md` and capture each shot manually,",
-      "saving as `marketing/screenshots/<page>-<width>.png` next to the theme bundle.",
-    ].join("\n"),
-  );
+/** Common Chrome locations to try when no explicit path is given. */
+const DEFAULT_CHROME_PATHS = [
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/Applications/Chromium.app/Contents/MacOS/Chromium",
+  "/usr/bin/google-chrome",
+  "/usr/bin/chromium",
+];
+
+export async function captureScreenshots(opts: CaptureOptions): Promise<ScreenshotResult> {
+  const chromePath =
+    opts.chromePath ?? process.env.CHROME_PATH ?? findChrome();
+  if (!chromePath) {
+    throw new Error(
+      [
+        "captureScreenshots: no Chrome / Chromium executable found.",
+        "",
+        "Tried:",
+        ...DEFAULT_CHROME_PATHS.map((p) => `  - ${p}`),
+        "",
+        "Either install Google Chrome (https://www.google.com/chrome/), or",
+        "set the CHROME_PATH env var / pass `chromePath` to the function.",
+      ].join("\n"),
+    );
+  }
+
+  // Lazy-import playwright so importing this module doesn't blow up
+  // when playwright-core is missing in a stripped-down environment.
+  let chromium: typeof import("playwright-core").chromium;
+  try {
+    ({ chromium } = await import("playwright-core"));
+  } catch (err) {
+    throw new Error(
+      `captureScreenshots: playwright-core is not installed. Run \`npm install playwright-core\` and retry. (${(err as Error).message})`,
+    );
+  }
+
+  mkdirSync(opts.outputDir, { recursive: true });
+  const timeout = opts.timeoutMs ?? 15_000;
+
+  const browser = await chromium.launch({
+    executablePath: chromePath,
+    headless: true,
+  });
+  const written: string[] = [];
+
+  try {
+    for (const shot of opts.brief) {
+      const context = await browser.newContext({
+        viewport: { width: shot.width, height: heightFor(shot.width) },
+        deviceScaleFactor: 2,
+      });
+      const page = await context.newPage();
+      const target = `${stripTrailingSlash(opts.url)}${pathForShotPage(shot.page)}`;
+
+      try {
+        await page.goto(target, { waitUntil: "networkidle", timeout });
+      } catch {
+        // Some pages (cart/checkout) on a brand-new install may 404 or
+        // redirect mid-load. We still want a screenshot of what's there
+        // — even an empty state — rather than aborting the whole batch.
+        await page.goto(target, { waitUntil: "domcontentloaded", timeout });
+      }
+
+      const file = join(opts.outputDir, `${shot.page}-${shot.width}.png`);
+      await page.screenshot({ path: file, fullPage: true });
+      written.push(file);
+      await context.close();
+    }
+  } finally {
+    await browser.close();
+  }
+
+  return { written };
 }
+
+// ── Helpers ─────────────────────────────────────────────────────────────
+
+function findChrome(): string | undefined {
+  for (const p of DEFAULT_CHROME_PATHS) {
+    if (existsSync(p) && statSync(p).isFile()) return p;
+  }
+  return undefined;
+}
+
+function pathForShotPage(page: MarketingAssets["screenshots_brief"][number]["page"]): string {
+  switch (page) {
+    case "homepage":         return "/";
+    case "single-product":   return "/?post_type=product"; // first product if any
+    case "archive-product":  return "/shop/";
+    case "page":             return "/sample-page/";
+    case "cart":             return "/cart/";
+    case "checkout":         return "/checkout/";
+  }
+}
+
+function heightFor(width: number): number {
+  // Reasonable initial viewport height so the layout has something to
+  // settle into before fullPage capture takes over.
+  if (width >= 1280) return 900;
+  if (width >= 768)  return 1024;
+  return 800;
+}
+
+function stripTrailingSlash(s: string): string {
+  return s.endsWith("/") ? s.slice(0, -1) : s;
+}
+
+// Re-export for tests (path mapping shouldn't drift from the WP routes
+// the screenshot brief assumes).
+export const __testing = { pathForShotPage, findChrome, heightFor };

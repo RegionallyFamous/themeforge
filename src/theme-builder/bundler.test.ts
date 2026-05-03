@@ -179,6 +179,7 @@ describe("bundleTheme (end-to-end with mocked LLM)", () => {
       "marketing/variations.md",
       "marketing/demo-concept.md",
       "marketing/screenshots-brief.md",
+      "marketing/screenshots-brief.json",
       "marketing/changelog.md",
     ]) {
       expect(existsSync(join(themeDir, f)), `missing ${f}`).toBe(true);

@@ -34,6 +34,7 @@ import { assertRoundTrip, validateMarkup } from "../theme-builder/validator.js";
 import { importPatternFromMarkup } from "../pattern-library/import.js";
 import { buildDeploymentManifest } from "../deploy/manifest.js";
 import { pickHost, HOSTS, NoHostConfiguredError } from "../deploy/hosts.js";
+import { captureScreenshots } from "../theme-builder/screenshots.js";
 
 const program = new Command();
 
@@ -318,8 +319,21 @@ program
   .option("--zip <path>", "Path to the .zip alongside the theme dir; auto-detected if omitted")
   .option("--target <value>", "Host-specific target (URL prefix, project id, etc.)")
   .option("--manifest-only", "Skip the deploy step and just print the deployment manifest")
+  .option(
+    "--screenshots [dir]",
+    "After deploy, capture every shot in marketing/screenshots-brief.json. Optional dir override (default: <themeDir>/marketing/screenshots/)",
+  )
   .action(
-    async (themeDir: string, opts: { host?: string; zip?: string; target?: string; manifestOnly?: boolean }) => {
+    async (
+      themeDir: string,
+      opts: {
+        host?: string;
+        zip?: string;
+        target?: string;
+        manifestOnly?: boolean;
+        screenshots?: string | boolean;
+      },
+    ) => {
       const absDir = resolvePath(themeDir);
 
       let manifest;
@@ -385,14 +399,43 @@ program
       }
 
       const spinner = ora(`Deploying to ${host.name}…`).start();
+      let deployedUrl: string | null = null;
       try {
         const result = await host.deploy(manifest, { target: opts.target });
+        deployedUrl = result.url;
         spinner.succeed(`Deployed to ${result.url}`);
         if (result.deployId) console.log(chalk.dim(`Deploy id: ${result.deployId}`));
         if (result.notes) console.log(chalk.dim(result.notes));
       } catch (e) {
         spinner.fail(`Deploy failed: ${(e as Error).message}`);
         process.exitCode = 1;
+        return;
+      }
+
+      if (opts.screenshots && deployedUrl) {
+        const briefPath = resolvePath(absDir, "marketing/screenshots-brief.json");
+        if (!existsSync(briefPath)) {
+          console.error(
+            chalk.red(`--screenshots: missing ${briefPath} (was the theme built without the marketing stage?)`),
+          );
+          process.exitCode = 1;
+          return;
+        }
+        const brief = JSON.parse(readFileSync(briefPath, "utf8"));
+        const outputDir =
+          typeof opts.screenshots === "string"
+            ? resolvePath(opts.screenshots)
+            : resolvePath(absDir, "marketing/screenshots");
+
+        const shotSpinner = ora(`Capturing ${brief.length} screenshots…`).start();
+        try {
+          const shots = await captureScreenshots({ url: deployedUrl, outputDir, brief });
+          shotSpinner.succeed(`Captured ${shots.written.length} screenshot${shots.written.length === 1 ? "" : "s"}`);
+          console.log(chalk.dim(`Output: ${outputDir}`));
+        } catch (e) {
+          shotSpinner.fail(`Screenshot capture failed: ${(e as Error).message}`);
+          process.exitCode = 1;
+        }
       }
     },
   );

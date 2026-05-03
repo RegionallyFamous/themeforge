@@ -21,12 +21,16 @@ export function renderMarketingFiles(
 ): MarketingFileSet {
   return {
     files: {
-      "description.md":      renderDescription(assets, meta),
-      "features.md":         renderFeatures(assets, meta),
-      "variations.md":       renderVariations(assets, meta),
-      "demo-concept.md":     renderDemoConcept(assets, meta),
-      "screenshots-brief.md": renderScreenshotsBrief(assets, meta),
-      "changelog.md":        renderChangelog(meta),
+      "description.md":        renderDescription(assets, meta),
+      "features.md":           renderFeatures(assets, meta),
+      "variations.md":         renderVariations(assets, meta),
+      "demo-concept.md":       renderDemoConcept(assets, meta),
+      "screenshots-brief.md":  renderScreenshotsBrief(assets, meta),
+      // Machine-readable sidecar consumed by `forge deploy --screenshots`
+      // and any future automation. Same content as the .md, in the
+      // shape Playwright takes directly.
+      "screenshots-brief.json": JSON.stringify(assets.screenshots_brief, null, 2) + "\n",
+      "changelog.md":          renderChangelog(meta),
     },
   };
 }

@@ -40,16 +40,23 @@ const assets: MarketingAssets = {
 };
 
 describe("renderMarketingFiles", () => {
-  it("emits exactly six markdown files at the expected paths", () => {
+  it("emits the expected files (six markdown + one JSON sidecar)", () => {
     const out = renderMarketingFiles(assets, meta);
     expect(Object.keys(out.files).sort()).toEqual([
       "changelog.md",
       "demo-concept.md",
       "description.md",
       "features.md",
+      "screenshots-brief.json",
       "screenshots-brief.md",
       "variations.md",
     ]);
+  });
+
+  it("screenshots-brief.json is the brief in the shape Playwright + the deploy CLI consume", () => {
+    const out = renderMarketingFiles(assets, meta);
+    const parsed = JSON.parse(out.files["screenshots-brief.json"]!);
+    expect(parsed).toEqual(assets.screenshots_brief);
   });
 
   it("description.md leads with the brand name and headline", () => {

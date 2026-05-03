@@ -1,18 +1,14 @@
 /**
- * Phase 10 deploy hosts — scaffold only.
+ * Phase 10 deploy hosts.
  *
- * Same shape as the Phase 8 screenshot scaffold: declared interface,
- * clear "wire it up" error until a host is implemented. The roadmap
- * names two viable paths (WordPress Playground hosted on Cloudflare
- * Pages, or a managed WP host like Kinsta/WP Engine via API). Picking
- * one is a business decision; this module's job is to leave both doors
- * open without forcing the choice now.
- *
- * Adding a host = drop a `<host-id>.ts` adapter alongside this file
- * exporting a `DeployHost` and register it in `HOSTS` below.
+ * Defines the `DeployHost` interface and registers built-in adapters.
+ * The default registration is the Studio adapter (Automattic's local-WP
+ * app) — see `studio.ts`. Add another host by dropping an adapter file
+ * alongside this one, importing it below, and adding it to `HOSTS`.
  */
 
 import type { DeploymentManifest } from "./manifest.js";
+import { createStudioHost } from "./studio.js";
 
 export interface DeployTarget {
   /** Host-specific destination identifier (URL prefix, project id, etc.). */
@@ -38,13 +34,13 @@ export interface DeployHost {
 }
 
 /**
- * No hosts wired up by default. The CLI surfaces this with a clear
- * "decide and implement one" error. Add a host by importing it here:
- *
- *   import { playgroundHost } from "./playground.js";
- *   export const HOSTS: Record<string, DeployHost> = { playground: playgroundHost };
+ * Built-in host registry. The Studio adapter ships out of the box;
+ * other adapters (WP Playground, Kinsta API, WP Engine API) drop in
+ * here as they're implemented.
  */
-export const HOSTS: Record<string, DeployHost> = {};
+export const HOSTS: Record<string, DeployHost> = {
+  studio: createStudioHost(),
+};
 
 export class NoHostConfiguredError extends Error {
   constructor() {

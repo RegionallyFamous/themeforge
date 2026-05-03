@@ -28,6 +28,7 @@
     "dotenv": "^16.4.0",
     "node-vibrant": "^3.2.1-alpha.1",
     "ora": "^8.0.0",
+    "playwright-core": "^1.59.1",
     "zod": "^3.23.0",
     "zod-to-json-schema": "^3.25.2"
   },
